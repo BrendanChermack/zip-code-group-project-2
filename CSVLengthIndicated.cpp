@@ -29,29 +29,31 @@
  * @note The output file is in binary format with each record prefixed by its length (in bytes).
  */
 void convertCSVToLengthIndicated(const std::string &csvFile, const std::string &outputFile) {
-    std::ifstream inputFile(csvFile);  ///< Input file stream to read the CSV file.
-    std::ofstream outputFileStream(outputFile, std::ios::binary);  ///< Output file stream to write the length-indicated data in binary.
+    std::ifstream inputFile(csvFile);
+    std::ofstream outputFileStream(outputFile, std::ios::binary);
 
-    // Check if the input or output files cannot be opened.
-    if (!inputFile.is_open() || !outputFileStream.is_open()) {
-        std::cerr << "Error opening file!" << std::endl;
+    if (!inputFile.is_open()) {
+        std::cerr << "Error: Could not open input file: " << csvFile << std::endl;
+        return;
+    }
+
+    if (!outputFileStream.is_open()) {
+        std::cerr << "Error: Could not create or open output file: " << outputFile << std::endl;
         return;
     }
 
     std::string line;
-    // Read each line (record) from the input CSV file.
     while (getline(inputFile, line)) {
-        size_t recordLength = line.length();  ///< Determine the length of the current record.
-        
-        // Write the length of the record first (in binary format).
+        size_t recordLength = line.length();
         outputFileStream.write(reinterpret_cast<const char *>(&recordLength), sizeof(recordLength));
-        // Write the actual record data as a comma-separated string.
         outputFileStream.write(line.c_str(), recordLength);
     }
 
-    inputFile.close();  ///< Close the input CSV file.
-    outputFileStream.close();  ///< Close the output binary file.
+    inputFile.close();
+    outputFileStream.close();
+    std::cout << "Successfully created the length-indicated file: " << outputFile << std::endl;
 }
+
 
 /**
  * @brief Reads a length-indicated record from a binary file.
