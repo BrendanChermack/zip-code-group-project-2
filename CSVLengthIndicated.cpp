@@ -17,6 +17,19 @@
 #include <iomanip>
 #include <iostream>  // Added this for std::cerr
 
+/**
+ * @brief Converts a CSV file into a length-indicated format.
+ * 
+ * This function reads the contents of a CSV file and writes each record to an output file, 
+ * with each field in the record prefixed by its length. The header row is written as-is without any length indicators.
+ * 
+ * @param csvFileName The name of the input CSV file.
+ * @param outputFileName The name of the output file where the length-indicated records will be written.
+ * 
+ * @note The header row in the CSV file is written without length indications.
+ * @note Each field's length is formatted as a two-digit number, padded with zeroes if necessary.
+ */
+
 void convertCSVToLengthIndicated(const std::string& csvFileName, const std::string& outputFileName) {
     std::ifstream inputFile(csvFileName);
     std::ofstream outputFile(outputFileName, std::ios::binary);
