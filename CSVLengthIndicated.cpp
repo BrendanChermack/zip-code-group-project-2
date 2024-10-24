@@ -11,48 +11,55 @@
  * October 18 2024
  */
 
-#include "CSVProcessing.h" 
+#include "CSVLengthIndicated.h"
 #include <fstream>
 #include <sstream>
-#include <iostream>
+#include <iomanip>
+#include <iostream>  // Added this for std::cerr
 
-/**
- * @brief Converts a CSV file to a length-indicated file format.
- * 
- * This function reads a CSV file and converts each record into a binary format where the length of each record
- * is indicated before the actual record content. Each record's length is written as a binary value, followed
- * by the record itself as a comma-separated string.
- * 
- * @param csvFile The input CSV file path.
- * @param outputFile The output file path where the length-indicated records will be written.
- * 
- * @note The output file is in binary format with each record prefixed by its length (in bytes).
- */
-void convertCSVToLengthIndicated(const std::string &csvFile, const std::string &outputFile) {
-    std::ifstream inputFile(csvFile);
-    std::ofstream outputFileStream(outputFile, std::ios::binary);
+void convertCSVToLengthIndicated(const std::string& csvFileName, const std::string& outputFileName) {
+    std::ifstream inputFile(csvFileName);
+    std::ofstream outputFile(outputFileName, std::ios::binary);
 
-    if (!inputFile.is_open()) {
-        std::cerr << "Error: Could not open input file: " << csvFile << std::endl;
-        return;
-    }
-
-    if (!outputFileStream.is_open()) {
-        std::cerr << "Error: Could not create or open output file: " << outputFile << std::endl;
+    if (!inputFile.is_open() || !outputFile.is_open()) {
+        std::cerr << "Failed to open file(s)." << std::endl;  // Now std::cerr should work properly
         return;
     }
 
     std::string line;
-    while (getline(inputFile, line)) {
-        size_t recordLength = line.length();
-        outputFileStream.write(reinterpret_cast<const char *>(&recordLength), sizeof(recordLength));
-        outputFileStream.write(line.c_str(), recordLength);
+    bool isFirstRow = true; // Flag to handle the first row (header)
+
+    while (std::getline(inputFile, line)) {
+        std::istringstream ss(line);
+        std::string token;
+        std::string lengthIndicatedLine;
+        bool isFirstToken = true; // Flag to avoid placing a comma before the first token
+
+        // For the first row, output as it is (header) without length indication
+        if (isFirstRow) {
+            outputFile << line << std::endl; // Output the header row as comma-separated
+            isFirstRow = false; // Mark that header row has been processed
+            continue;
+        }
+
+        // For each field in the subsequent rows, compute the length and append it before the actual value
+        while (std::getline(ss, token, ',')) {
+            if (!isFirstToken) {
+                lengthIndicatedLine += ",";  // Add a comma between fields
+            }
+            std::stringstream lengthToken;
+            lengthToken << std::setw(2) << std::setfill('0') << token.length() << token;
+            lengthIndicatedLine += lengthToken.str();  // Add the formatted field to the output line
+            isFirstToken = false;
+        }
+
+        outputFile << lengthIndicatedLine << std::endl;  // Write the formatted line to the output file
     }
 
     inputFile.close();
-    outputFileStream.close();
-    std::cout << "Successfully created the length-indicated file: " << outputFile << std::endl;
+    outputFile.close();
 }
+
 
 
 /**
