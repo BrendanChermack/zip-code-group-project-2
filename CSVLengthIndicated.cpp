@@ -16,6 +16,8 @@
 #include <sstream>
 #include <iomanip>
 #include <iostream>  // Added this for std::cerr
+#include <vector>
+
 
 /**
  * @brief Converts a CSV file into a length-indicated format.
@@ -30,39 +32,64 @@
  * @note Each field's length is formatted as a two-digit number, padded with zeroes if necessary.
  */
 
-void convertCSVToLengthIndicated(const std::string& csvFileName, const std::string& outputFileName) {
-    std::ifstream inputFile(csvFileName);
-    std::ofstream outputFile(outputFileName, std::ios::binary);
+void convertCSVToLengthIndicated( const std::string& csvFileName, const std::string& outputFileName ) {
+    std::ifstream inputFile( csvFileName );
+    std::ofstream outputFile( outputFileName );
 
-    if (!inputFile.is_open() || !outputFile.is_open()) {
-        std::cerr << "Failed to open file(s)." << std::endl;  // Now std::cerr should work properly
+    if ( !inputFile.is_open() || !outputFile.is_open() ) {
+        std::cerr << "Failed to open file(s)." << std::endl;
         return;
     }
 
     std::string line;
-    bool isFirstRow = true; // Flag to handle the first row (header)
+    bool isFirstRow = true;
 
-    while (std::getline(inputFile, line)) {
-        std::istringstream ss(line);
-        std::string token;
-        std::string lengthIndicatedLine;
-        bool isFirstToken = true; // Flag to avoid placing a comma before the first token
-
-        // For the first row, output as it is (header) without length indication
-        if (isFirstRow) {
-            outputFile << line << std::endl; // Output the header row as comma-separated
-            isFirstRow = false; // Mark that header row has been processed
+    while ( std::getline( inputFile, line ) ) {
+        // Skip the header row
+        if ( isFirstRow ) {
+            isFirstRow = false;
             continue;
         }
 
-        // For each field in the subsequent rows, compute the length and append it before the actual value
-        while (std::getline(ss, token, ',')) {
-            if (!isFirstToken) {
+        std::istringstream ss( line );
+        std::string token;
+        std::string lengthIndicatedLine;
+        bool isFirstToken = true;
+
+        // For each field, compute the length and append it before the actual value
+        while ( std::getline( ss, token, ',' ) ) {
+            if ( !isFirstToken ) {
                 lengthIndicatedLine += ",";  // Add a comma between fields
             }
+
+            // Strip quotation marks if necessary
+            if ( !token.empty() && token.front() == '"' && token.back() == '"' ) {
+                token = token.substr( 1, token.length() - 2 );
+            }
+
+            // Ensure the length does not exceed 99
+            if ( token.length() > 99 ) {
+                std::cerr << "Field length exceeds two-digit limit: " << token << std::endl;
+                token = token.substr( 0, 99 );  // Truncate to 99 characters
+            }
+
+            // Convert floating-point numbers to strings with fixed precision
+            if ( token.find( '.' ) != std::string::npos && ( token[ 0 ] >= '0' && token[ 0 ] <= '9' || token[ 0 ] == '-' ) ) {
+                // It's a number, ensure fixed precision
+                double num = std::stod( token );
+                std::ostringstream oss;
+                oss << std::fixed << std::setprecision( 6 ) << num;
+                token = oss.str();
+            }
+
+            int fieldLength = token.length();
+
+            // For debugging purposes, print field data and length
+            // std::cout << "Field Data: '" << token << "', Length: " << fieldLength << std::endl;
+
             std::stringstream lengthToken;
-            lengthToken << std::setw(2) << std::setfill('0') << token.length() << token;
-            lengthIndicatedLine += lengthToken.str();  // Add the formatted field to the output line
+            lengthToken << std::setw( 2 ) << std::setfill( '0' ) << fieldLength << token;
+            lengthIndicatedLine += lengthToken.str();
             isFirstToken = false;
         }
 
@@ -86,15 +113,37 @@ void convertCSVToLengthIndicated(const std::string& csvFileName, const std::stri
  * 
  * @note The function assumes the record length is stored as a `size_t` before each record in the binary file.
  */
-std::string readLengthIndicatedRecord(std::ifstream &fileStream) {
-    size_t recordLength;  ///< Variable to store the length of the record.
-    
-    // Read the length of the record (stored as a binary value).
-    fileStream.read(reinterpret_cast<char *>(&recordLength), sizeof(recordLength));
+std::vector<std::vector<std::string>> readCSV( const std::string& filename ) {
+    std::vector<std::vector<std::string>> data;  // Outer vector to store all rows
 
-    std::string record(recordLength, '\0');  ///< Initialize a string to hold the record data.
-    // Read the actual record data.
-    fileStream.read(&record[0], recordLength);
+    std::ifstream file( filename );  // Open the file
+    if ( !file.is_open() ) {
+        std::cerr << "Error: Could not open file " << filename << std::endl;
+        return data;
+    }
 
-    return record;  ///< Return the record data as a string.
+    std::string line;
+    bool isHeader = true;  // Skip the header row if needed
+
+    // Read the file line by line
+    while ( std::getline( file, line ) ) {
+        if ( isHeader ) {  // Skip the first header line
+            isHeader = false;
+            continue;
+        }
+
+        std::istringstream ss( line );  // Create a string stream for parsing the line
+        std::vector<std::string> row;  // Inner vector to store each row's fields
+        std::string field;
+
+        // Parse each field separated by commas
+        while ( std::getline( ss, field, ',' ) ) {
+            row.push_back( field );  // Add each field to the row vector
+        }
+
+        data.push_back( row );  // Add the row to the outer vector
+    }
+
+    file.close();  // Close the file
+    return data;   // Return the populated data
 }

@@ -127,44 +127,76 @@ ZipCodeRecord Buffer::parse_csv_line(const std::string& line) const {
  * @param record The ZipCodeRecord structure to populate.
  * @return True if a record is successfully read, false if end-of-file is reached or an error occurs.
  */
-bool Buffer::readLengthIndicatedRecord(std::ifstream &fileStream, ZipCodeRecord &record) {
-    if (!fileStream.is_open()) {
-        std::cerr << "File not open." << std::endl;
+bool Buffer::readLengthIndicatedRecord( std::ifstream& fileStream, ZipCodeRecord& record ) {
+    if ( !fileStream.is_open() || fileStream.eof() ) {
         return false;
     }
 
-    size_t recordLength;
-    // Read the length of the record
-    fileStream.read(reinterpret_cast<char*>(&recordLength), sizeof(recordLength));
-
-    // Check if we reached the end of the file
-    if (fileStream.eof()) {
-        return false;  // No more records
+    std::string line;
+    if ( !std::getline( fileStream, line ) ) {
+        return false;  // EOF reached
     }
 
-    // Read the actual record data based on the length
-    std::string recordData(recordLength, '\0');
-    fileStream.read(&recordData[0], recordLength);
+    std::stringstream ss( line );
 
-    // Split the recordData by commas to extract the fields
-    std::stringstream ss(recordData);
+    auto parseField = [ ]( std::stringstream& ss ) -> std::string {
+        // Skip any leading whitespace
+        while ( std::isspace( ss.peek() ) ) {
+            ss.get();
+        }
 
-    // Extract the fields and store them in the ZipCodeRecord
-    getline(ss, record.zip_code, ',');
-    getline(ss, record.city, ',');         // Get City
-    getline(ss, record.state_id, ',');     // Get State ID
-    std::string latitude_str, longitude_str;
-    getline(ss, latitude_str, ',');
-    getline(ss, longitude_str, ',');
+        // Read the two-digit length
+        char lengthChars[ 3 ] = { 0 };  // Two digits + null terminator
+        if ( !ss.read( lengthChars, 2 ) ) {
+            throw std::runtime_error( "Failed to read field length." );
+        }
 
-    // Convert latitude and longitude from string to double
+        std::string lengthStr( lengthChars, 2 );  // Ensure we have exactly 2 characters
+        int fieldLength = 0;
+
+        try {
+            fieldLength = std::stoi( lengthStr );
+        }
+        catch ( const std::exception& e ) {
+            std::cerr << "Invalid field length: '" << lengthStr << "'" << std::endl;
+            throw;
+        }
+
+        // Read the field data
+        std::string fieldData( fieldLength, '\0' );
+        if ( !ss.read( &fieldData[ 0 ], fieldLength ) ) {
+            throw std::runtime_error( "Failed to read field data." );
+        }
+
+        // Check if we've read the expected number of characters
+        if ( fieldData.length() != static_cast< size_t >( fieldLength ) ) {
+            throw std::runtime_error( "Field data length mismatch." );
+        }
+
+        // Consume the comma delimiter if not at the end
+        if ( ss.peek() == ',' ) {
+            ss.get();
+        }
+
+        return fieldData;
+        };
+
     try {
-        record.latitude = std::stod(latitude_str);
-        record.longitude = std::stod(longitude_str);
-    } catch (const std::invalid_argument &e) {
-        std::cerr << "Error converting latitude/longitude for Zip Code: " << record.zip_code << std::endl;
-        record.latitude = 0.0;
-        record.longitude = 0.0;
+        // Parse all fields, including 'County'
+        record.zip_code = parseField( ss );        // Field 1: Zip Code
+        record.city = parseField( ss );            // Field 2: City
+        record.state_id = parseField( ss );        // Field 3: State ID
+        std::string county = parseField( ss );     // Field 4: County (you can store it if needed)
+        std::string latitude_str = parseField( ss );   // Field 5: Latitude
+        std::string longitude_str = parseField( ss );  // Field 6: Longitude
+
+        // Convert latitude and longitude from string to double
+        record.latitude = std::stod( latitude_str );
+        record.longitude = std::stod( longitude_str );
+    }
+    catch ( const std::exception& e ) {
+        std::cerr << "Error parsing record: " << e.what() << std::endl;
+        return false;
     }
 
     return true;

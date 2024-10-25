@@ -17,6 +17,7 @@
 
 #include <string>
 #include <fstream>
+#include <vector>
 
 /**
  * @brief Converts a CSV file to a length-indicated file format.
@@ -44,6 +45,6 @@ void convertCSVToLengthIndicated(const std::string &csvFile, const std::string &
  * 
  * @note The function assumes that the file is in the correct binary format, with each record prefixed by its length.
  */
-std::string readLengthIndicatedRecord(std::ifstream &fileStream);
+std::vector<std::vector<std::string>> readLengthIndicatedRecord( std::ifstream& fileStream );
 
 #endif // CSV_LENGTH_INDICATED_H
