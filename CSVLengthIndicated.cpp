@@ -47,6 +47,7 @@ void convertCSVToLengthIndicated( const std::string& csvFileName, const std::str
     while ( std::getline( inputFile, line ) ) {
         // Skip the header row
         if ( isFirstRow ) {
+            // add header row
             isFirstRow = false;
             continue;
         }

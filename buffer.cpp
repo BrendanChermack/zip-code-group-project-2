@@ -186,7 +186,7 @@ bool Buffer::readLengthIndicatedRecord( std::ifstream& fileStream, ZipCodeRecord
         record.zip_code = parseField( ss );        // Field 1: Zip Code
         record.city = parseField( ss );            // Field 2: City
         record.state_id = parseField( ss );        // Field 3: State ID
-        std::string county = parseField( ss );     // Field 4: County (you can store it if needed)
+        std::string county = parseField( ss );     // Field 4: County
         std::string latitude_str = parseField( ss );   // Field 5: Latitude
         std::string longitude_str = parseField( ss );  // Field 6: Longitude
 
