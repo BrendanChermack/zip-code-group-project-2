@@ -2,9 +2,15 @@
  * @file CSVLengthIndicated.h
  * @brief Header file for functions to handle length-indicated file conversion and reading.
  * 
- * This header file declares the functions that convert a CSV file into a length-indicated format
- * and read records from a length-indicated binary file. The length-indicated format prefixes each
- * record with the length of the record (in bytes) before the actual data.
+ * This header file declares functions for converting a CSV file into a length-indicated format
+ * and for reading records from a length-indicated file. The length-indicated format prefixes each 
+ * record with the byte length of the record, facilitating variable-length data handling.
+ * 
+ * @details
+ * The length-indicated format is a custom structure where each record’s length is stored before
+ * the actual data, allowing for efficient parsing of variable-length records. Functions included:
+ * - `convertCSVToLengthIndicated()`: Converts CSV data to a length-indicated format.
+ * - `readLengthIndicatedRecord()`: Reads a record from a length-indicated file.
  * 
  * @author
  * Thomas Hoerger
@@ -20,30 +26,31 @@
 #include <vector>
 
 /**
- * @brief Converts a CSV file to a length-indicated file format.
+ * @brief Converts a CSV file to a length-indicated format.
  * 
- * This function reads a CSV file and writes each record into a binary file format where the length of each 
- * record (in bytes) is stored before the record itself as a comma-separated string. The length is stored 
- * as a binary value, followed by the record data.
+ * Reads a CSV file, processes each record to prefix each field with its length, 
+ * and writes the result to an output file in the length-indicated format.
  * 
- * @param csvFile The input CSV file path.
- * @param outputFile The output file path where the length-indicated records will be written.
+ * @param csvFile The name of the input CSV file to be converted.
+ * @param outputFile The name of the output file where the length-indicated format data will be saved.
  * 
- * @note The output file will be in binary format with each record prefixed by its length.
+ * @note The header row of the CSV is written without length indications, while all data rows
+ * have each field prefixed by a two-digit length indicator.
  */
 void convertCSVToLengthIndicated(const std::string &csvFile, const std::string &outputFile);
 
 /**
- * @brief Reads a single length-indicated record from a file stream.
+ * @brief Reads a length-indicated record from a file stream.
  * 
- * This function reads a binary file containing length-indicated records and extracts a single record. 
- * The length of the record is read first, followed by the actual record content, which is returned 
- * as a string.
+ * Reads a single record from the provided length-indicated file stream. Each record is parsed
+ * by reading the specified length prefix before each field. The function returns the record data 
+ * as a vector of strings, with each string representing a field in the record.
  * 
- * @param fileStream An input file stream from which the length-indicated record will be read.
- * @return A string containing the record data.
+ * @param fileStream The input file stream from which to read the length-indicated record.
+ * @return A vector of vectors of strings, where each inner vector represents a record read from the file.
  * 
- * @note The function assumes that the file is in the correct binary format, with each record prefixed by its length.
+ * @note This function assumes each field is prefixed by its length as a two-digit integer.
+ * @warning The file stream should be opened in binary mode for correct reading.
  */
 std::vector<std::vector<std::string>> readLengthIndicatedRecord( std::ifstream& fileStream );
 
