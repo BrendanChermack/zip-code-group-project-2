@@ -120,7 +120,7 @@ void convertCSVToLengthIndicated(const std::string& csvFileName, const std::stri
  * @note This function assumes a simple CSV structure with fields separated by commas.
  * @warning An error message is displayed if the file cannot be opened.
  */
-std::vector<std::vector<std::string>> readCSV(const std::string& filename) {
+std::vector<std::vector<std::string>> readLengthIndicatedRecord( const std::string& filename ) {
     std::vector<std::vector<std::string>> data;  // Outer vector to store all rows
 
     std::ifstream file(filename);  // Open the CSV file for reading

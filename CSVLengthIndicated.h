@@ -52,6 +52,6 @@ void convertCSVToLengthIndicated(const std::string &csvFile, const std::string &
  * @note This function assumes each field is prefixed by its length as a two-digit integer.
  * @warning The file stream should be opened in binary mode for correct reading.
  */
-std::vector<std::vector<std::string>> readLengthIndicatedRecord( std::ifstream& fileStream );
+std::vector<std::vector<std::string>> readLengthIndicatedRecord( const std::string& filename );
 
 #endif // CSV_LENGTH_INDICATED_H

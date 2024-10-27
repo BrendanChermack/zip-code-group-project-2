@@ -3,6 +3,7 @@
 #include "CSVLengthIndicated.h"
 #include <iostream>
 #include <fstream>
+#include "IndexFile.h"
 using namespace std;
 
 void csvConvert_sort( CSVProcessing origin, string file ) {
@@ -32,25 +33,26 @@ int main() {
 
     // Step 2: Convert both CSV files to length-indicated format (ASCII)
     cout << "\nConverting both CSVs to length-indicated format (ASCII)." << endl;
-    std::string lengthIndicatedFileName1 = "us_postal_codes_length_indicated.csv";  // Using .txt for ASCII output
-    std::string lengthIndicatedFileName2 = "us_postal_codes_RANDOMIZED_length_indicated.csv";  // Using .txt for ASCII output
-    convertCSVToLengthIndicated( csvFileName1, lengthIndicatedFileName1 );
-    convertCSVToLengthIndicated( csvFileName2, lengthIndicatedFileName2 );
+    // std::string lengthIndicatedFileName1 = "us_postal_codes_length_indicated.csv";  // Using .txt for ASCII output
+    // std::string lengthIndicatedFileName2 = "us_postal_codes_RANDOMIZED_length_indicated.csv";  // Using .txt for ASCII output
+    // convertCSVToLengthIndicated( csvFileName1, lengthIndicatedFileName1 );
+    // convertCSVToLengthIndicated( csvFileName2, lengthIndicatedFileName2 );
     cout << "Both CSV files converted to length-indicated ASCII format." << endl;
 
     // Step 3: Read from the first length-indicated file using Buffer class
-    cout << "\nReading from length-indicated file (1):" << endl;
-    std::ifstream inputFile1( lengthIndicatedFileName1 );
-    Buffer buffer;
-    ZipCodeRecord record;
+    // cout << "\nReading from length-indicated file (1):" << endl;
+    // std::ifstream inputFile1( lengthIndicatedFileName1 );
+    // Buffer buffer;
+    // ZipCodeRecord record;
 
-    // Unpack and display the records from the first length-indicated file
-    while ( buffer.readLengthIndicatedRecord( inputFile1, record ) ) {
-        cout << "Zip Code: " << record.zip_code << ", City: " << record.city
-            << ", State: " << record.state_id << ", Latitude: " << record.latitude
-            << ", Longitude: " << record.longitude << endl;
-    }
-    inputFile1.close();
-
+    // // Unpack and display the records from the first length-indicated file
+    // while ( buffer.readLengthIndicatedRecord( inputFile1, record ) ) {
+    //     cout << "Zip Code: " << record.zip_code << ", City: " << record.city
+    //         << ", State: " << record.state_id << ", Latitude: " << record.latitude
+    //         << ", Longitude: " << record.longitude << endl;
+    // }
+    // inputFile1.close();
+    IndexFile iF;
+    iF.createIndexFile( "us_postal_codes_length_indicated.csv", "index.txt" );
     return 0;
 }
