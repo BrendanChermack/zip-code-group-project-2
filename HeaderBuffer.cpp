@@ -7,6 +7,11 @@
 #include <sstream>
 #include <iomanip>
 
+/**
+ * @brief Default constructor for HeaderBuffer
+ * 
+ * Initializes all numeric members to zero
+ */
 HeaderBuffer::HeaderBuffer() 
     : headerRecordSize(0)
     , recordSizeBytes(0)
@@ -15,6 +20,18 @@ HeaderBuffer::HeaderBuffer()
     , primaryKeyField(0) {
 }
 
+/**
+ * @brief Writes the header information to a file
+ * 
+ * @param filename The name of the file to write to
+ * @return true if the write operation was successful
+ * @return false if there was an error opening or writing to the file
+ * 
+ * @details The header is written in a length-indicated format where each field
+ * is preceded by a two-digit length indicator. Fields are separated by commas.
+ * The header includes file structure information, version, sizes, and metadata
+ * about the fields in the file.
+ */
 bool HeaderBuffer::writeHeader(const std::string& filename) {
     std::ofstream file(filename);
     if (!file.is_open()) {
@@ -22,7 +39,12 @@ bool HeaderBuffer::writeHeader(const std::string& filename) {
         return false;
     }
 
-    // Helper function to write length-indicated field
+    /**
+     * @brief Lambda function to write a length-indicated field
+     * 
+     * @param value The string value to write
+     * @details Prepends a two-digit length indicator to the value
+     */
     auto writeField = [&file](const std::string& value) {
         std::string lengthStr = std::to_string(value.length());
         if (lengthStr.length() < 2) lengthStr = "0" + lengthStr;
@@ -51,6 +73,18 @@ bool HeaderBuffer::writeHeader(const std::string& filename) {
     return true;
 }
 
+/**
+ * @brief Reads and parses the header information from a file
+ * 
+ * @param filename The name of the file to read from
+ * @return true if the read operation was successful
+ * @return false if there was an error opening or reading from the file
+ * 
+ * @details The method reads a header in length-indicated format where each field
+ * is preceded by a two-digit length indicator. 
+ * 
+ * @throws std::runtime_error if the length indicators are invalid
+ */
 bool HeaderBuffer::readHeader(const std::string& filename) {
     std::ifstream file(filename);
     if (!file.is_open()) {
