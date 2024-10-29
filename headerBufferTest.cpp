@@ -16,23 +16,18 @@ int main() {
     header.setPrimaryKeyField(0);
 
     // Add field metadata
-    header.addFieldMetadata("zip_code", "string");
-    header.addFieldMetadata("city", "string");
-    header.addFieldMetadata("state_id", "string");
-    header.addFieldMetadata("county", "string");
-    header.addFieldMetadata("latitude", "double");
-    header.addFieldMetadata("longitude", "double");
+    header.addFieldMetadata("test", "string");
 
     // Write header to file
     if (header.writeHeader("headerBufferTest.csv")) {
-        std::cout << "Header written to zipcode_data.txt" << std::endl;
+        std::cout << "Header written to zipcode_data.csv" << std::endl;
     } else {
         std::cerr << "Failed to write header" << std::endl;
     }
 
     // Read header from file
     HeaderBuffer readHeader;
-    if (readHeader.readHeader("zipcode_data.txt")) {
+    if (readHeader.readHeader("headerBufferTest.csv")) {
         std::cout << "Header read successfully:" << std::endl;
         std::cout << "File structure type: " << readHeader.getFileStructureType() << std::endl;
         std::cout << "Version: " << readHeader.getVersion() << std::endl;
