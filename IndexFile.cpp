@@ -36,10 +36,11 @@ bool IndexFile::createIndexFile( const std::string& csvFileName, const std::stri
             if ( field.size() >= 2 ) {  // Ensure the field has at least two characters
                 std::string offsetInString = field.substr( 0, 2 );  // Get the first two characters
                 int fieldOffset = std::stoi( offsetInString );  // Convert to integer
-                fieldOffset = fieldOffset +2;
-                rowOffset += fieldOffset;  // Add to the row's total offset
+                
+                rowOffset += fieldOffset + 2;  // Add to the row's total offset
             }
         }
+		rowOffset += 5;
 
         // Add the row's total offset to the cumulative offset
     }
