@@ -22,21 +22,29 @@ bool HeaderBuffer::writeHeader(const std::string& filename) {
         return false;
     }
 
-    // Write all header fields with length indicators
-    file << "02" << fileStructureType << ","
-         << "02" << version << ","
-         << "02" << std::to_string(headerRecordSize) << ","
-         << "02" << std::to_string(recordSizeBytes) << ","
-         << "02" << sizeFormatType << ","
-         << "02" << indexFileName << ","
-         << "02" << std::to_string(recordCount) << ","
-         << "02" << std::to_string(fieldCount) << ","
-         << "02" << std::to_string(primaryKeyField) << std::endl;
+    // Helper function to write length-indicated field
+    auto writeField = [&file](const std::string& value) {
+        std::string lengthStr = std::to_string(value.length());
+        if (lengthStr.length() < 2) lengthStr = "0" + lengthStr;
+        file << lengthStr << value;
+    };
+
+    // Write main header fields
+    writeField(fileStructureType); file << ",";
+    writeField(version); file << ",";
+    writeField(std::to_string(headerRecordSize)); file << ",";
+    writeField(std::to_string(recordSizeBytes)); file << ",";
+    writeField(sizeFormatType); file << ",";
+    writeField(indexFileName); file << ",";
+    writeField(std::to_string(recordCount)); file << ",";
+    writeField(std::to_string(fieldCount)); file << ",";
+    writeField(std::to_string(primaryKeyField));
+    file << "\n";
 
     // Write field metadata
     for (const auto& field : fields) {
-        file << "02" << field.name << ","
-             << "02" << field.typeSchema << std::endl;
+        writeField(field.name); file << ",";
+        writeField(field.typeSchema); file << "\n";
     }
 
     file.close();
@@ -53,26 +61,27 @@ bool HeaderBuffer::readHeader(const std::string& filename) {
     std::string line;
     if (std::getline(file, line)) {
         std::stringstream ss(line);
-        std::string lengthStr, value;
-
-        // Helper lambda to read a length-indicated field
+        
+        // Helper function to read length-indicated field
         auto readField = [](std::stringstream& ss) -> std::string {
-            std::string len(2, '\0');
-            ss.read(&len[0], 2);  // Read 2-digit length
-            if (len.empty() || !std::isdigit(len[0]) || !std::isdigit(len[1])) {
+            std::string lenStr;
+            lenStr.resize(2);
+            ss.read(&lenStr[0], 2);
+            
+            if (!std::isdigit(lenStr[0]) || !std::isdigit(lenStr[1])) {
                 throw std::runtime_error("Invalid length indicator");
             }
-            int length = std::stoi(len);
-            std::string val(length, '\0');
-            ss.read(&val[0], length);
-            if (ss.peek() == ',') {
-                ss.get();  // Skip comma
-            }
-            return val;
+            
+            int length = std::stoi(lenStr);
+            std::string value;
+            value.resize(length);
+            ss.read(&value[0], length);
+            
+            if (ss.peek() == ',') ss.ignore();
+            return value;
         };
 
         try {
-            // Read main header fields
             fileStructureType = readField(ss);
             version = readField(ss);
             headerRecordSize = std::stoi(readField(ss));
@@ -83,7 +92,6 @@ bool HeaderBuffer::readHeader(const std::string& filename) {
             fieldCount = std::stoi(readField(ss));
             primaryKeyField = std::stoi(readField(ss));
 
-            // Read field metadata
             fields.clear();
             for (int i = 0; i < fieldCount && std::getline(file, line); i++) {
                 std::stringstream fieldSS(line);

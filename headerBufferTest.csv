@@ -1,7 +1,7 @@
-02CSV,021.0,02256,024,02ASCII,02headerBufferTest.csv,021000,026,020
-02zip_code,02string
-02city,02string
-02state_id,02string
-02county,02string
-02latitude,02double
-02longitude,02double
+03CSV,031.0,03256,014,05ASCII,20headerBufferTest.csv,041000,016,010
+08zip_code,06string
+04city,06string
+08state_id,06string
+06county,06string
+08latitude,06double
+09longitude,06double
