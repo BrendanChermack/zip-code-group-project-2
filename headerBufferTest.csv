@@ -1,0 +1,7 @@
+02CSV,021.0,02256,024,02ASCII,02headerBufferTest.csv,021000,026,020
+02zip_code,02string
+02city,02string
+02state_id,02string
+02county,02string
+02latitude,02double
+02longitude,02double
