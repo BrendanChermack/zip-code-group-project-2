@@ -3,6 +3,7 @@
 #include "CSVLengthIndicated.h"
 #include <iostream>
 #include <fstream>
+#include "IndexFile.h"
 using namespace std;
 
 void csvConvert_sort( CSVProcessing origin, string file ) {
@@ -60,7 +61,7 @@ std::string getRecordAtOffset(const std::string& filename, int offset) {
 }
 
 
-void check( const std::string& str, std::string& outputfile){
+void check( const std::string& str, const std::string& outputfile){
 	bool notfound = true;
 	bool skip = false;
 	std::string correct_line;
@@ -121,8 +122,10 @@ int main() {
     // Print results
     for (const auto& str : result) {
         //std::cout << str << std::endl;
-		check(str,"us_postal_codes_length_indicated.csv");
-		check(str,"us_postal_codes_RANDOMIZED_length_indicated.csv");
+		string output1 = "us_postal_codes_length_indicated.csv";
+		string output2 = "us_postal_codes_RANDOMIZED_length_indicated.csv";
+		check(str,output1);
+		check(str,output2);
 		
 		
     }
