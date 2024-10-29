@@ -126,8 +126,6 @@ int main() {
 		string output2 = "us_postal_codes_RANDOMIZED_length_indicated.csv";
 		check(str,output1);
 		check(str,output2);
-		
-		
     }
     
     return 0;
