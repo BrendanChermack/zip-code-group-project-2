@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "HeaderBuffer.h"
 
 using namespace std;
 
