@@ -1,0 +1,89 @@
+Script started on 2024-10-29 20:14:35-05:00 [TERM="xterm-256color" TTY="/dev/pts/4" COLUMNS="225" LINES="19"]
+[?2004h]0;brendan@Brendan: ~/zip-code-group-project-2[01;32mbrendan@Brendan[00m:[01;34m~/zip-code-group-project-2[00m$ git pullshcommit -m "added index file logic"add .[K./app.exeg++ *.cpp -o app.exe
+[?2004l[?2004h]0;brendan@Brendan: ~/zip-code-group-project-2[01;32mbrendan@Brendan[00m:[01;34m~/zip-code-group-project-2[00m$ g++ *.cpp -o app.exe[12Pit pullshcommit -m "added index file logic"add .[K./app.exeg++ *.cpp -o app.exe[11P./app.exe
+[?2004lProcessing and sorting both CSV files.
+Generating header row.
+Header added successfully to output1.csv
+Checking for errors
+Errors: CSV is now in the buffer
+Data successfully written to output1.csv
+No
+File made!Generating header row.
+Header added successfully to output2.csv
+Checking for errors
+Errors: CSV is now in the buffer
+Data successfully written to output2.csv
+No
+File made!
+Converting both CSVs to length-indicated format (ASCII).
+Both CSV files converted to length-indicated ASCII format.
+Please enter the zip codes you want information about!
+-z501
+Length indicated record at 501 is 03501,10Holtsville,02NY,07Suffolk,0940.815400,10-73.045100
+[?2004h]0;brendan@Brendan: ~/zip-code-group-project-2[01;32mbrendan@Brendan[00m:[01;34m~/zip-code-group-project-2[00m$ ./app.exeg++ *.cpp -o app.exe[11P./app.exe
+[?2004lProcessing and sorting both CSV files.
+Generating header row.
+Header added successfully to output1.csv
+Checking for errors
+Errors: CSV is now in the buffer
+Data successfully written to output1.csv
+No
+File made!Generating header row.
+Header added successfully to output2.csv
+Checking for errors
+Errors: CSV is now in the buffer
+Data successfully written to output2.csv
+No
+File made!
+Converting both CSVs to length-indicated format (ASCII).
+Both CSV files converted to length-indicated ASCII format.
+Please enter the zip codes you want information about!
+-z501-544-1001^[[D^[[D            z1001
+501-544 was not found in the index.Length indicated record at 1001 is 041001,06Agawam,02MA,07Hampden,0942.070200,10-72.622700
+[?2004h]0;brendan@Brendan: ~/zip-code-group-project-2[01;32mbrendan@Brendan[00m:[01;34m~/zip-code-group-project-2[00m$ ./app.exe
+[?2004lProcessing and sorting both CSV files.
+Generating header row.
+Header added successfully to output1.csv
+Checking for errors
+Errors: CSV is now in the buffer
+Data successfully written to output1.csv
+No
+File made!Generating header row.
+Header added successfully to output2.csv
+Checking for errors
+Errors: CSV is now in the buffer
+Data successfully written to output2.csv
+No
+File made!
+Converting both CSVs to length-indicated format (ASCII).
+Both CSV files converted to length-indicated ASCII format.
+Please enter the zip codes you want information about!
+^[[A^[[B        z-  -z501-z544-z1001
+Length indicated record at 501 is 03501,10Holtsville,02NY,07Suffolk,0940.815400,10-73.045100
+Length indicated record at 544 is 03544,10Holtsville,02NY,07Suffolk,0940.815400,10-73.045100
+Length indicated record at 1001 is 041001,06Agawam,02MA,07Hampden,0942.070200,10-72.622700
+[?2004h]0;brendan@Brendan: ~/zip-code-group-project-2[01;32mbrendan@Brendan[00m:[01;34m~/zip-code-group-project-2[00m$ -z1
+[?2004l-z1: command not found
+[?2004h]0;brendan@Brendan: ~/zip-code-group-project-2[01;32mbrendan@Brendan[00m:[01;34m~/zip-code-group-project-2[00m$ e[K-z1./app.exe
+[?2004lProcessing and sorting both CSV files.
+Generating header row.
+Header added successfully to output1.csv
+Checking for errors
+Errors: CSV is now in the buffer
+Data successfully written to output1.csv
+No
+File made!Generating header row.
+Header added successfully to output2.csv
+Checking for errors
+Errors: CSV is now in the buffer
+Data successfully written to output2.csv
+No
+File made!
+Converting both CSVs to length-indicated format (ASCII).
+Both CSV files converted to length-indicated ASCII format.
+Please enter the zip codes you want information about!
+-z1
+1 was not found in the index.[?2004h]0;brendan@Brendan: ~/zip-code-group-project-2[01;32mbrendan@Brendan[00m:[01;34m~/zip-code-group-project-2[00m$ exit
+[?2004lexit
+
+Script done on 2024-10-29 20:15:51-05:00 [COMMAND_EXIT_CODE="0"]
