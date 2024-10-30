@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include "IndexFile.h"
+#include "HeaderBuffer.h"
 using namespace std;
 
 void csvConvert_sort( CSVProcessing origin, string file ) {
