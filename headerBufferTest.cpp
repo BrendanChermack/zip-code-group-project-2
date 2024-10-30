@@ -1,7 +1,7 @@
 #include "HeaderBuffer.h"
 #include <iostream>
 
-int main() {
+int tester() {
     HeaderBuffer header;
 
     // Set header fields

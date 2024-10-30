@@ -69,22 +69,22 @@ void check( const std::string& str, const std::string& outputfile, const std::st
         std::cerr << "Error opening file: index.txt " << std::endl;
         return;
     }
-	cout << "str is: " << str << endl;
+	// cout << "str is: " << str << endl;
 	std::string strcopy = str;
 //	while (strcopy.length() > 0 && strcopy[0] == '0') {
   //      strcopy.erase(0, 1);
     //}
 	std::string length, zipcode; //Current word of the index being looked at
     //The length to be skipped to find the proper line
-	int i = 0;
+	int i = 5;
 	
     while ((file2 >> zipcode >> length) && !file2.eof()) {  // reads word by word
         if(zipcode == str){
 			int offset = std::stoi(length);
-			cout << "Offset is: " << offset<< endl;
-
+			// cout << "Offset is: " << offset<< endl;
+            cout << "Length indicated record at " << zipcode << " is ";
 			correct_line = getRecordAtOffset(outputfile, offset+i);
-			cout << correct_line<< endl;
+			cout << correct_line << endl;
 			notfound = false;
 			break;
 			}
@@ -118,8 +118,8 @@ int main() {
     cout << "\nConverting both CSVs to length-indicated format (ASCII)." << endl;
     std::string lengthIndicatedFileName1 = "us_postal_codes_length_indicated.csv";  // Using .txt for ASCII output
     std::string lengthIndicatedFileName2 = "us_postal_codes_RANDOMIZED_length_indicated.csv";  // Using .txt for ASCII output
-    convertCSVToLengthIndicated( csvFileName1, lengthIndicatedFileName1 );
-    convertCSVToLengthIndicated( csvFileName2, lengthIndicatedFileName2 );
+    // convertCSVToLengthIndicated( csvFileName1, lengthIndicatedFileName1 );
+    // convertCSVToLengthIndicated( csvFileName2, lengthIndicatedFileName2 );
     cout << "Both CSV files converted to length-indicated ASCII format." << endl;
 	cout << "Please enter the zip codes you want information about!" << endl;
 	std::string text;
