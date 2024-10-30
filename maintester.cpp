@@ -6,7 +6,7 @@
 #include "IndexFile.h"
 using namespace std;
 
-/*void csvConvert_sort( CSVProcessing origin, string file ) {
+void csvConvert_sort( CSVProcessing origin, string file ) {
     cout << "Generating header row." << endl;
     origin.addHeader( file );  // Generate the header for the CSV file
     cout << "Checking for errors" << endl << "Errors: ";
@@ -52,10 +52,9 @@ std::string getRecordAtOffset(const std::string& filename, int offset) {
     if (!file.is_open()) {
         throw std::runtime_error("Could not open data file.");
     }
-
+	offset = offset;
     file.seekg(offset);  // Jump to the ASCII character position
     std::string line;
-	std::string linew;
    std::getline(file, line);
     file.close();
     return line;
@@ -77,20 +76,20 @@ void check( const std::string& str, const std::string& outputfile, const std::st
     //}
 	std::string length, zipcode; //Current word of the index being looked at
     //The length to be skipped to find the proper line
-	
+	int i = 0;
 	
     while ((file2 >> zipcode >> length) && !file2.eof()) {  // reads word by word
         if(zipcode == str){
 			int offset = std::stoi(length);
 			cout << "Offset is: " << offset<< endl;
-			correct_line = getRecordAtOffset(outputfile, offset);
+
+			correct_line = getRecordAtOffset(outputfile, offset+i);
 			cout << correct_line<< endl;
 			notfound = false;
 			break;
 			}
 			else{
-				cout << "heading forward"<< endl;
-		
+				i++;
 				
 			}
 			
@@ -102,64 +101,7 @@ void check( const std::string& str, const std::string& outputfile, const std::st
 			file2.close();
 }
 
-*/
 
-// Function to find the offset of the given zipcode from the index file
-std::streampos findOffsetInIndex(const std::string& indexFile, const std::string& zipcode) {
-    std::ifstream file(indexFile);
-    if (!file.is_open()) {
-        throw std::runtime_error("Could not open index file.");
-    }
-
-    std::string lineZipcode;
-    std::streampos offset;
-
-    // Iterate through the index file to find the matching zipcode
-    while (file >> lineZipcode >> offset) {
-        if (lineZipcode == zipcode) {
-            file.close();
-            return offset;  // Found the offset for the zipcode
-        }
-    }
-
-    file.close();
-    throw std::runtime_error("Zipcode not found in index.");
-}
-
-// Function to get the record from the data file using the offset
-std::string getRecordAtOffset(const std::string& dataFile, std::streampos offset) {
-    std::ifstream file(dataFile);
-    if (!file.is_open()) {
-        throw std::runtime_error("Could not open data file.");
-    }
-
-    file.seekg(offset);  // Jump to the byte offset
-    std::string line;
-    std::getline(file, line);  // Read the record
-
-    file.close();
-    return line;
-}
-
-int main() {
-    try {
-        // Search for a specific zipcode
-        std::string zipcode = "1001";  // Replace with the zipcode you want to search for
-
-        // Find the offset from the index file
-        std::streampos offset = findOffsetInIndex("index.txt", zipcode);
-
-        // Get the record from the data file using the found offset
-        std::string record = getRecordAtOffset("records.txt", offset);
-
-        std::cout << "Record for zipcode " << zipcode << ": " << record << std::endl;
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
-    }
-
-    return 0;
-}
-/*
 int main() {
     CSVProcessing csvProcessor;
     std::string csvFileName1 = "us_postal_codes.csv";              // Input CSV file 1
@@ -176,7 +118,7 @@ int main() {
     cout << "\nConverting both CSVs to length-indicated format (ASCII)." << endl;
     std::string lengthIndicatedFileName1 = "us_postal_codes_length_indicated.csv";  // Using .txt for ASCII output
     std::string lengthIndicatedFileName2 = "us_postal_codes_RANDOMIZED_length_indicated.csv";  // Using .txt for ASCII output
-    //convertCSVToLengthIndicated( csvFileName1, lengthIndicatedFileName1 );
+    convertCSVToLengthIndicated( csvFileName1, lengthIndicatedFileName1 );
     convertCSVToLengthIndicated( csvFileName2, lengthIndicatedFileName2 );
     cout << "Both CSV files converted to length-indicated ASCII format." << endl;
 	cout << "Please enter the zip codes you want information about!" << endl;
@@ -198,4 +140,3 @@ int main() {
     
     return 0;
 }
-*/
