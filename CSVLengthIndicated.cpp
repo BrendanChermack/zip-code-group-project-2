@@ -25,6 +25,7 @@
 #include <iomanip>
 #include <iostream>  // Added this for std::cerr
 #include <vector>
+#include "HeaderBuffer.h"
 
 
 /**
@@ -45,6 +46,18 @@ void convertCSVToLengthIndicated(const std::string& csvFileName, const std::stri
     std::ofstream outputFile(outputFileName);  // Open the output file for writing
     HeaderBuffer header;
 
+
+	HeaderBuffer header;
+	header.setFileStructureType("CSV");
+    header.setVersion("1.0");
+    header.setHeaderSize(256);
+    header.setRecordSizeBytes(4);
+    header.setSizeFormat("ASCII");
+    header.setIndexFileName("headerBufferTest.csv");
+    header.setRecordCount(1000);
+    header.setFieldCount(6);
+    header.setPrimaryKeyField(0);
+    header.writeHeader( csvFileName );
     // Check if either file failed to open
     if (!inputFile.is_open() || !outputFile.is_open()) {
         std::cerr << "Failed to open file(s)." << std::endl;
