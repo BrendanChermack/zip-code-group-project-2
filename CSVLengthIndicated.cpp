@@ -19,6 +19,7 @@
  */
 
 #include "CSVLengthIndicated.h"
+#include "HeaderBuffer.h"
 #include <fstream>
 #include <sstream>
 #include <iomanip>
@@ -43,6 +44,7 @@
 void convertCSVToLengthIndicated(const std::string& csvFileName, const std::string& outputFileName) {
     std::ifstream inputFile(csvFileName);  // Open the CSV file for reading
     std::ofstream outputFile(outputFileName);  // Open the output file for writing
+    HeaderBuffer header;
 
 
 	// HeaderBuffer header;
@@ -62,16 +64,60 @@ void convertCSVToLengthIndicated(const std::string& csvFileName, const std::stri
         return;
     }
 
+    // Initialize header properties
+    header.setFileStructureType("CSV");
+    header.setVersion("1.0");
+    header.setSizeFormat("2D"); // Two-digit length indicators
+    header.setIndexFileName("index.txt"); // No index file for now
+
+    std::string headerLine;
+    std::getline(inputFile, headerLine);
+
+    // Parse header to count fields and determine field metadata
+    std::istringstream headerStream(headerLine);
+    std::string fieldName;
+    while (std::getline(headerStream, fieldName, ',')) {
+        // Remove any quotation marks from field names
+        if (!fieldName.empty() && fieldName.front() == '"' && fieldName.back() == '"') {
+            fieldName = fieldName.substr(1, fieldName.length() - 2);
+        }
+        
+        FieldMetadata field;
+        field.name = fieldName;
+        field.typeSchema = "STRING"; // Default type
+        header.addFieldMetadata(fieldName, "string");
+    }
+
+    header.setFieldCount(header.getFields().size());
+    header.setPrimaryKeyField(0); // Assume first field is primary key
+
     std::string line;
-    bool isFirstRow = true;  // Flag to check if we're on the header row
+    size_t maxRecordSize = 0;
+    header.setRecordCount(0);
+
+    while (std::getline(inputFile, line)) {
+        header.setRecordCount(header.getRecordCount() + 1);
+        maxRecordSize = std::max(maxRecordSize, line.length());
+    }
+
+    header.setRecordSizeBytes(maxRecordSize);
+    header.setHeaderSize(headerLine.length());
+
+    // Write header
+    header.writeHeader(outputFileName);
+
+    // Reset file position to start of data
+    inputFile.clear();
+    inputFile.seekg(0);
+    std::getline(inputFile, line); // Skip header line again
 
     // Process each line in the CSV file
     while (std::getline(inputFile, line)) {
         // Skip the header row and write it as-is without length indicators
-        if (isFirstRow) {
-            isFirstRow = false;  // Set the flag to false after processing the header
-            continue;
-        }
+        // if (isFirstRow) {
+        //     isFirstRow = false;  // Set the flag to false after processing the header
+        //     continue;
+        // }
 
         std::istringstream ss(line);  // String stream to parse each field in the line
         std::string token;
@@ -135,6 +181,13 @@ void convertCSVToLengthIndicated(const std::string& csvFileName, const std::stri
  */
 std::vector<std::vector<std::string>> readLengthIndicatedRecord( const std::string& filename ) {
     std::vector<std::vector<std::string>> data;  // Outer vector to store all rows
+    HeaderBuffer header;
+
+    // Read the header first
+    if (!header.readHeader(filename)) {
+        std::cerr << "Error: Could not read header from " << filename << std::endl;
+        return data;
+    }
 
     std::ifstream file(filename);  // Open the CSV file for reading
     if (!file.is_open()) {  // Check if the file failed to open
@@ -143,14 +196,20 @@ std::vector<std::vector<std::string>> readLengthIndicatedRecord( const std::stri
     }
 
     std::string line;
-    bool isHeader = true;  // Flag to skip the header row
+    size_t recordsRead = 0;
+
+    // Skip past the header section
+    while (std::getline(file, line) && recordsRead < header.getFieldCount() + 1) {
+        recordsRead++;
+    }
+    //bool isHeader = true;  // Flag to skip the header row
 
     // Read each line from the file
     while (std::getline(file, line)) {
-        if (isHeader) {  // Skip the header row
-            isHeader = false;
-            continue;
-        }
+        // if (isHeader) {  // Skip the header row
+        //     isHeader = false;
+        //     continue;
+        // }
 
         std::istringstream ss(line);  // String stream for parsing the line
         std::vector<std::string> row;  // Inner vector to store fields in each row
