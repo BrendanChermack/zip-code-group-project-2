@@ -1,3 +1,9 @@
+/**
+ * @file CSVProcessing.cpp
+ * @brief Implementation of CSV processing and zip code lookup functionality
+ * @details This file contains implementations for CSV file processing, conversion to length-indicated format,
+ *          and zip code lookup functionality using index files.
+ */
 #include "CSVProcessing.h"
 #include "buffer.h"
 #include "CSVLengthIndicated.h"
@@ -5,7 +11,12 @@
 #include <fstream>
 #include "IndexFile.h"
 using namespace std;
-
+**
+ * @brief Converts and sorts CSV data to a specified output file
+ * @param origin CSVProcessing object that handles the CSV operations
+ * @param file Output file name where the processed CSV will be saved
+ * @details Generates a header row and processes the CSV data, reporting any errors encountered during the operation
+ */
 void csvConvert_sort( CSVProcessing origin, string file ) {
     cout << "Generating header row." << endl;
     origin.addHeader( file );  // Generate the header for the CSV file
@@ -18,7 +29,13 @@ void csvConvert_sort( CSVProcessing origin, string file ) {
         cout << "Yes" << endl << "File not made.";
     }
 }
-
+/**
+ * @brief Splits a string containing zip codes separated by "-z" delimiter
+ * @param str Input string containing zip codes
+ * @return vector<string> Vector containing individual zip codes
+ * @details Processes a string containing multiple zip codes separated by "-z" delimiter,
+ *          handles special cases like strings starting with "-z" and empty segments
+ */
 std::vector<std::string> splitZipLine(const std::string& str) {
     std::vector<std::string> result;
     size_t start = 0;
@@ -46,7 +63,15 @@ std::vector<std::string> splitZipLine(const std::string& str) {
     
     return result;
 }
-
+/**
+ * @brief Retrieves a record from a file at a specific offset
+ * @param filename Name of the file to read from
+ * @param offset Position in the file where the record starts
+ * @return string The record found at the specified offset
+ * @throws runtime_error If the file cannot be opened
+ * @details Opens the specified file, seeks to the given offset position,
+ *          and reads one line from that position
+ */
 std::string getRecordAtOffset(const std::string& filename, int offset) {
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -60,7 +85,15 @@ std::string getRecordAtOffset(const std::string& filename, int offset) {
     return line;
 }
 
-
+/**
+ * @brief Checks for and retrieves zip code information from indexed data
+ * @param str Zip code to search for
+ * @param outputfile Name of the file containing the actual data
+ * @param indexName Name of the index file
+ * @details Searches for a zip code in the index file and retrieves the corresponding
+ *          record from the data file using the stored offset. Prints error message
+ *          if zip code is not found
+ */
 void check( const std::string& str, const std::string& outputfile, const std::string& indexName){
 	bool notfound = true;
 	std::string correct_line;
@@ -101,7 +134,16 @@ void check( const std::string& str, const std::string& outputfile, const std::st
 			file2.close();
 }
 
-
+/**
+ * @brief Main function that orchestrates CSV processing and zip code lookup
+ * @return int Returns 0 on successful execution
+ * @details Performs the following operations:
+ *          1. Converts and sorts two CSV files
+ *          2. Converts both CSV files to length-indicated format
+ *          3. Creates an index file for zip code lookup
+ *          4. Accepts user input for zip codes to look up
+ *          5. Processes and displays information for requested zip codes
+ */
 int main() {
     CSVProcessing csvProcessor;
     std::string csvFileName1 = "us_postal_codes.csv";              // Input CSV file 1
