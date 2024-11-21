@@ -19,7 +19,7 @@ struct ZipCodeRecord {
 class Buffer {
 public:
     // Method to read a CSV file and store records in the buffer
-    bool read_csv(const std::string& us_postal_codes.csv, size_t records_per_block = 100);
+    bool read_csv(const std::string& csv_filenam, size_t records_per_block = 100);
 
     // Method to get all Zip Code records, grouped by state
     std::map<std::string, std::vector<ZipCodeRecord>> get_state_zip_codes() const;
