@@ -1,7 +1,11 @@
 /**
  * @file Block.h
  * @brief Declaration of the Block structure and related global variables and functions for managing a blocked sequence set.
- * @author Thomas Hoerger
+ * 
+ * This file defines the structure of a block and declares global variables and functions
+ * used to manage a sequence of blocks for a blocked file system. It supports operations
+ * such as dumping blocks in physical or logical order.
+ * 
  * @date 11/21/2024
  */
 
@@ -11,16 +15,14 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <string>
 
- /**
+/**
  * @struct Block
  * @brief Represents a single block in the blocked sequence set.
  * 
- * A block can either be part of the active list or the available list.
- * It contains metadata such as predecessor and successor links and a list of records.
-/**
- * @brief Represents a block in the blocked sequence set.
+ * A block can either be part of the active list or the available list. It contains metadata
+ * such as predecessor and successor links and a list of records. Each block is uniquely
+ * identified by a Relative Block Number (RBN).
  */
 struct Block {
     int RBN;                           ///< Relative Block Number (unique identifier for the block)
@@ -32,16 +34,22 @@ struct Block {
 
 /** 
  * @brief Global map of blocks indexed by Relative Block Number (RBN).
+ * 
+ * This map stores all blocks, with the RBN as the key and the corresponding block as the value.
  */
 extern std::map<int, Block> blocks;
 
 /** 
  * @brief Head of the active block list (RBN).
+ * 
+ * Stores the RBN of the first block in the logical (active) sequence.
  */
 extern int listHeadRBN;
 
 /** 
  * @brief Head of the available block list (RBN).
+ * 
+ * Stores the RBN of the first block in the available (free) list.
  */
 extern int availHeadRBN;
 
@@ -49,7 +57,7 @@ extern int availHeadRBN;
  * @brief Dumps blocks in physical order based on their RBNs.
  * 
  * This function iterates over all blocks in ascending order of their RBNs and prints their details.
- * Available blocks are marked explicitly.
+ * Available blocks are explicitly marked.
  */
 void dumpPhysicalOrder();
 
@@ -68,7 +76,30 @@ void dumpLogicalOrder();
  * @param records List of records to store in the block.
  * @param predecessorRBN RBN of the predecessor block in the chain.
  * @param successorRBN RBN of the successor block in the chain.
+ * 
+ * This function initializes a new block with the provided parameters and adds it to the global map.
  */
 void createBlock(int RBN, bool isAvailable, const std::vector<std::string>& records, int predecessorRBN, int successorRBN);
+
+/**
+ * @brief Parses a block file and populates the global map of blocks.
+ * 
+ * This function reads a block file, extracts block information, and populates the global `blocks` map.
+ * 
+ * @param blockFile Path to the block file to parse.
+ */
+void parseBlockFile(const std::string& blockFile);
+
+/**
+ * @brief Creates a block file from an input CSV file.
+ * 
+ * This function reads an input CSV file, divides the data into blocks of a specified size, and writes the blocks to an output file.
+ * 
+ * @param inputFile Path to the input CSV file.
+ * @param outputFile Path to the output block file.
+ * @param BLOCK_SIZE Maximum size of each block in bytes (default is 512).
+ * @return True if successful, false otherwise.
+ */
+bool createBlockFile(const std::string& inputFile, const std::string& outputFile, size_t BLOCK_SIZE = 512);
 
 #endif // BLOCK_H
