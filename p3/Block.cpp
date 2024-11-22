@@ -9,10 +9,22 @@
 #include <iostream>
 #include <iomanip>
 #include <algorithm>  // For std::sort
+#include <fstream>
+
 
 using namespace std;
 
-/** 
+bool createBlockFile( const string inputFile, const string outputFile, int blockSize = 512 ) {
+  ifstream file( inputFile );
+  ofstream output( outputFile );
+  if ( !file.is_open() || !output.is_open() ) {
+    return false;
+  }
+  
+}
+
+
+/**
  * @brief Global map of blocks indexed by Relative Block Number (RBN). 
  */
 unordered_map<int, Block> blocks;

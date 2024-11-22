@@ -16,7 +16,9 @@
 #include <unordered_map>
 #include <string>
 
-/**
+bool createBlockFile( const string inputFile, const string outputFile );
+
+ /**
  * @struct Block
  * @brief Represents a single block in the blocked sequence set.
  * 
