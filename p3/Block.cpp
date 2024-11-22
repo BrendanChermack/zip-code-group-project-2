@@ -7,21 +7,38 @@
 
 using namespace std;
 
-/** 
- * Global map of blocks indexed by Relative Block Number (RBN).
+/**
+ * @brief Global map of blocks indexed by Relative Block Number (RBN).
+ * 
+ * This map holds all blocks, with the RBN as the key and the block as the value.
  */
 map<int, Block> blocks;
 
-/** 
- * Head of the active block list (RBN).
+/**
+ * @brief Head of the active block list (RBN).
+ * 
+ * Represents the first block in the logical sequence of active blocks.
  */
 int listHeadRBN = -1;
 
-/** 
- * Head of the available block list (RBN).
+/**
+ * @brief Head of the available block list (RBN).
+ * 
+ * Represents the first block in the list of available (free) blocks.
  */
 int availHeadRBN = -1;
 
+/**
+ * @brief Creates a block file from an input CSV file.
+ * 
+ * Reads the input CSV file, splits the data into blocks of a specified size, and writes the blocks to an output file.
+ * Each block is identified by its Relative Block Number (RBN) and contains a list of records.
+ * 
+ * @param inputFile Path to the input CSV file.
+ * @param outputFile Path to the output block file.
+ * @param BLOCK_SIZE Maximum size of each block in bytes.
+ * @return True if the block file was successfully created, false otherwise.
+ */
 bool createBlockFile(const std::string& inputFile, const std::string& outputFile, size_t BLOCK_SIZE) {
     ifstream inFile(inputFile);
     ofstream outFile(outputFile);
@@ -73,6 +90,13 @@ bool createBlockFile(const std::string& inputFile, const std::string& outputFile
     return true;
 }
 
+/**
+ * @brief Parses a block file and populates the global map of blocks.
+ * 
+ * Reads the block file, extracts block data, and populates the global `blocks` map with the parsed data.
+ * 
+ * @param blockFile Path to the block file to parse.
+ */
 void parseBlockFile(const string& blockFile) {
     ifstream inFile(blockFile);
     if (!inFile.is_open()) {
@@ -99,6 +123,11 @@ void parseBlockFile(const string& blockFile) {
     inFile.close();
 }
 
+/**
+ * @brief Dumps blocks in physical order based on their RBNs.
+ * 
+ * Iterates through all blocks in the global map in ascending RBN order and displays their details.
+ */
 void dumpPhysicalOrder() {
     cout << "Dumping Blocks by Physical Order:\n";
     for (const auto& [RBN, block] : blocks) {
@@ -110,6 +139,11 @@ void dumpPhysicalOrder() {
     }
 }
 
+/**
+ * @brief Dumps blocks in logical order starting from the active list head.
+ * 
+ * Traverses the logical chain of blocks using the `successorRBN` and displays their details.
+ */
 void dumpLogicalOrder() {
     cout << "Dumping Blocks by Logical Order:\n";
     int currentRBN = listHeadRBN;
@@ -124,6 +158,15 @@ void dumpLogicalOrder() {
     }
 }
 
+/**
+ * @brief Creates a new block and inserts it into the global map.
+ * 
+ * @param RBN Relative Block Number of the new block.
+ * @param isAvailable Flag indicating whether the block is available (true) or active (false).
+ * @param records List of records to store in the block.
+ * @param predecessorRBN RBN of the predecessor block in the chain.
+ * @param successorRBN RBN of the successor block in the chain.
+ */
 void createBlock(int RBN, bool isAvailable, const vector<string>& records, int predecessorRBN, int successorRBN) {
     Block block;
     block.RBN = RBN;
@@ -142,6 +185,16 @@ void createBlock(int RBN, bool isAvailable, const vector<string>& records, int p
     }
 }
 
+/**
+ * @brief Main function to create a block file, parse it, and dump block data.
+ * 
+ * Executes the following steps:
+ * - Creates a block file from an input CSV file.
+ * - Parses the generated block file to populate the global `blocks` map.
+ * - Dumps the blocks in physical and logical order.
+ * 
+ * @return int Exit code.
+ */
 int main() {
     string inputFile = "us_postal_codes.csv";
     string outputFile = "blocks.txt";
