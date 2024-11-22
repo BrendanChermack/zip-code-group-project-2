@@ -1,7 +1,7 @@
 #include "Block.h"
 #include <iostream>
 #include <fstream>
-#include <sstream>  // For string stream
+#include <sstream>
 #include <vector>
 #include <map>
 
@@ -10,34 +10,34 @@ using namespace std;
 /**
  * @brief Global map of blocks indexed by Relative Block Number (RBN).
  * 
- * This map holds all blocks, with the RBN as the key and the block as the value.
+ * This map stores all blocks, where the key is the RBN, and the value is the block object.
  */
 map<int, Block> blocks;
 
 /**
  * @brief Head of the active block list (RBN).
  * 
- * Represents the first block in the logical sequence of active blocks.
+ * Stores the RBN of the first block in the active (logical) sequence.
  */
 int listHeadRBN = -1;
 
 /**
  * @brief Head of the available block list (RBN).
  * 
- * Represents the first block in the list of available (free) blocks.
+ * Stores the RBN of the first block in the available (free) list.
  */
 int availHeadRBN = -1;
 
 /**
  * @brief Creates a block file from an input CSV file.
  * 
- * Reads the input CSV file, splits the data into blocks of a specified size, and writes the blocks to an output file.
- * Each block is identified by its Relative Block Number (RBN) and contains a list of records.
+ * This function reads an input CSV file, divides its data into fixed-size blocks, 
+ * and writes those blocks into a new output file.
  * 
  * @param inputFile Path to the input CSV file.
  * @param outputFile Path to the output block file.
  * @param BLOCK_SIZE Maximum size of each block in bytes.
- * @return True if the block file was successfully created, false otherwise.
+ * @return True if the file was successfully created, false otherwise.
  */
 bool createBlockFile(const std::string& inputFile, const std::string& outputFile, size_t BLOCK_SIZE) {
     ifstream inFile(inputFile);
@@ -47,16 +47,16 @@ bool createBlockFile(const std::string& inputFile, const std::string& outputFile
         return false;
     }
 
-    size_t blockNumber = 1;
-    size_t currentBlockSize = 0;
-    vector<string> blockRecords;
+    size_t blockNumber = 1;               ///< Current block number being written
+    size_t currentBlockSize = 0;          ///< Current size of the block in bytes
+    vector<string> blockRecords;          ///< Records for the current block
 
     string line;
     getline(inFile, line); // Skip header
     while (getline(inFile, line)) {
         size_t lineSize = line.size() + 1; // Include newline character
         if (currentBlockSize + lineSize > BLOCK_SIZE) {
-            // Write the current block
+            // Write the current block to the output file
             outFile << blockNumber << ":";
             for (size_t i = 0; i < blockRecords.size(); i++) {
                 outFile << blockRecords[i];
@@ -64,7 +64,6 @@ bool createBlockFile(const std::string& inputFile, const std::string& outputFile
             }
             outFile << "\n";
 
-            // Start a new block
             blockRecords.clear();
             currentBlockSize = 0;
             blockNumber++;
@@ -74,7 +73,7 @@ bool createBlockFile(const std::string& inputFile, const std::string& outputFile
         currentBlockSize += lineSize;
     }
 
-    // Write the last block
+    // Write the last block if there are remaining records
     if (!blockRecords.empty()) {
         outFile << blockNumber << ":";
         for (size_t i = 0; i < blockRecords.size(); i++) {
@@ -93,7 +92,8 @@ bool createBlockFile(const std::string& inputFile, const std::string& outputFile
 /**
  * @brief Parses a block file and populates the global map of blocks.
  * 
- * Reads the block file, extracts block data, and populates the global `blocks` map with the parsed data.
+ * This function reads a block file, splits its content into blocks, 
+ * and populates the `blocks` map with their respective details.
  * 
  * @param blockFile Path to the block file to parse.
  */
@@ -107,16 +107,17 @@ void parseBlockFile(const string& blockFile) {
     string line;
     while (getline(inFile, line)) {
         size_t colonPos = line.find(':');
-        int RBN = stoi(line.substr(0, colonPos));
+        int RBN = stoi(line.substr(0, colonPos));  ///< Extracted RBN of the block
         string recordsPart = line.substr(colonPos + 1);
 
-        vector<string> records;
+        vector<string> records;                   ///< Records in the block
         stringstream recordStream(recordsPart);
         string record;
         while (getline(recordStream, record, ',')) {
             records.push_back(record);
         }
 
+        // Create a block using the parsed data
         createBlock(RBN, false, records, -1, -1);
     }
 
@@ -124,9 +125,10 @@ void parseBlockFile(const string& blockFile) {
 }
 
 /**
- * @brief Dumps blocks in physical order based on their RBNs.
+ * @brief Dumps all blocks in physical order.
  * 
- * Iterates through all blocks in the global map in ascending RBN order and displays their details.
+ * This function iterates through all blocks stored in the global `blocks` map 
+ * and prints their details in ascending order of their RBNs.
  */
 void dumpPhysicalOrder() {
     cout << "Dumping Blocks by Physical Order:\n";
@@ -140,13 +142,14 @@ void dumpPhysicalOrder() {
 }
 
 /**
- * @brief Dumps blocks in logical order starting from the active list head.
+ * @brief Dumps all blocks in logical order starting from the active list head.
  * 
- * Traverses the logical chain of blocks using the `successorRBN` and displays their details.
+ * This function follows the logical chain of blocks using their successor links 
+ * and prints the details of each block in sequence.
  */
 void dumpLogicalOrder() {
     cout << "Dumping Blocks by Logical Order:\n";
-    int currentRBN = listHeadRBN;
+    int currentRBN = listHeadRBN;  ///< Start from the logical list head
     while (currentRBN != -1) {
         const Block& block = blocks[currentRBN];
         cout << "RBN: " << currentRBN << " ";
@@ -154,12 +157,16 @@ void dumpLogicalOrder() {
             cout << record << " ";
         }
         cout << "\n";
-        currentRBN = block.successorRBN;
+        currentRBN = block.successorRBN;  ///< Move to the next block in the chain
     }
 }
 
 /**
  * @brief Creates a new block and inserts it into the global map.
+ * 
+ * This function initializes a new block with the provided details and inserts 
+ * it into the `blocks` map. It also updates the global head pointers for the 
+ * active and available block lists as needed.
  * 
  * @param RBN Relative Block Number of the new block.
  * @param isAvailable Flag indicating whether the block is available (true) or active (false).
@@ -177,6 +184,7 @@ void createBlock(int RBN, bool isAvailable, const vector<string>& records, int p
 
     blocks[RBN] = block;
 
+    // Update the global head pointers
     if (!isAvailable && listHeadRBN == -1) {
         listHeadRBN = RBN;
     }
