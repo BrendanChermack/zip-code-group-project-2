@@ -3,17 +3,60 @@
 #include <iomanip>
 #include <algorithm>  // For std::sort
 #include <fstream>
+#include <string>
 
 
 using namespace std;
 
-bool createBlockFile( const string inputFile, const string outputFile, int blockSize = 512 ) {
-  ifstream file( inputFile );
-  ofstream output( outputFile );
-  if ( !file.is_open() || !output.is_open() ) {
+bool createBlockFile( const std::string inputFile, const std::string outputFile, size_t BLOCK_SIZE = 512 ) {
+  ifstream inFile( inputFile );
+  ofstream outFile( outputFile );
+  if ( !inFile.is_open() || !outFile.is_open() ) {
+    cerr << "Error: Could not open input or output file: " << inputFile << " | " << outputFile << endl;
     return false;
   }
-  
+
+  size_t blockNumber = 1; // Start block numbering at 1
+  size_t currentBlockSize = 0;
+  vector<string> blockRecords;
+
+  string line;
+  getline( inFile, line );
+  while ( getline( inFile, line ) ) {
+    size_t lineSize = line.size() + 1; // Include newline character
+    if ( currentBlockSize + lineSize > BLOCK_SIZE ) {
+      // Write the current block to the output file
+      outFile << blockNumber << ":";
+      for ( size_t i = 0; i < blockRecords.size(); i++ ) {
+        outFile << blockRecords[ i ];
+        if ( i < blockRecords.size() - 1 ) outFile << ",";
+      }
+      outFile << "\n";
+
+      // Start a new block
+      blockRecords.clear();
+      currentBlockSize = 0;
+      blockNumber++;
+    }
+
+    blockRecords.push_back( line );
+    currentBlockSize += lineSize;
+  }
+
+  // Write the last block if it has any records
+  if ( !blockRecords.empty() ) {
+    outFile << blockNumber << ",";
+    for ( size_t i = 0; i < blockRecords.size(); i++ ) {
+      outFile << blockRecords[ i ];
+      if ( i < blockRecords.size() - 1 ) outFile << ",";
+    }
+    outFile << "\n";
+  }
+
+  inFile.close();
+  outFile.close();
+
+  return true;
 }
 
 
@@ -123,7 +166,8 @@ void createBlock(int RBN, bool isAvailable, const vector<string>& records, int p
  * @return int Exit code.
  */
 int main() {
-    // Simulate block creation with sample data
+  createBlockFile( "us_postal_codes.csv", "blocks.txt" );
+  // Simulate block creation with sample data
     createBlock(1, false, {"keya", "keyb", "keyc"}, -1, 2); // Create an active block
     createBlock(2, false, {"keyd", "keye"}, 1, 3); // Create another active block
     createBlock(3, false, {"keyf"}, 2, -1); // Create the last active block

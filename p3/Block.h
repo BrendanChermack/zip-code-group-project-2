@@ -11,8 +11,7 @@
 #include <vector>
 #include <string>
 #include <map>
-
-bool createBlockFile( const string inputFile, const string outputFile );
+#include <string>
 
  /**
  * @struct Block
