@@ -1,64 +1,55 @@
 /**
  * @file Block.h
- * @brief Header file for the blocked sequence set operations and data structures.
- * 
- * This file contains the declarations for managing blocked sequence sets, including
- * data structures and functions for physical and logical order dumps.
- * 
+ * @brief Declaration of the Block structure and related global variables and functions for managing a blocked sequence set.
  * @author Thomas Hoerger
  * @date 11/21/2024
  */
 
-#ifndef BLOCKED_SEQUENCE_SET_H
-#define BLOCKED_SEQUENCE_SET_H
+#ifndef BLOCK_H
+#define BLOCK_H
 
 #include <vector>
-#include <unordered_map>
 #include <string>
+#include <map>
 
 /**
- * @struct Block
- * @brief Represents a single block in the blocked sequence set.
- * 
- * A block can either be part of the active list or the available list.
- * It contains metadata such as predecessor and successor links and a list of records.
+ * @brief Represents a block in the blocked sequence set.
  */
 struct Block {
-    int RBN;                            ///< Relative Block Number
-    int predecessorRBN;                 ///< RBN of the predecessor block in the chain
-    int successorRBN;                   ///< RBN of the successor block in the chain
-    std::vector<std::string> records;   ///< List of records in the block
-    bool isAvailable;                   ///< Flag indicating if the block is available
+    int RBN;                           ///< Relative Block Number (unique identifier for the block)
+    bool isAvailable;                  ///< Flag indicating whether the block is available
+    std::vector<std::string> records;  ///< Records stored in the block
+    int predecessorRBN;                ///< RBN of the predecessor block in the chain
+    int successorRBN;                  ///< RBN of the successor block in the chain
 };
 
 /** 
- * @brief Global map of blocks indexed by Relative Block Number (RBN). 
+ * @brief Global map of blocks indexed by Relative Block Number (RBN).
  */
-extern std::unordered_map<int, Block> blocks;
+extern std::map<int, Block> blocks;
 
 /** 
- * @brief Head of the active block list (RBN). 
+ * @brief Head of the active block list (RBN).
  */
 extern int listHeadRBN;
 
 /** 
- * @brief Head of the available block list (RBN). 
+ * @brief Head of the available block list (RBN).
  */
 extern int availHeadRBN;
 
 /**
  * @brief Dumps blocks in physical order based on their RBNs.
  * 
- * This function iterates over all blocks in ascending order of their RBNs
- * and prints their details, including predecessor and successor links.
+ * This function iterates over all blocks in ascending order of their RBNs and prints their details.
+ * Available blocks are marked explicitly.
  */
 void dumpPhysicalOrder();
 
 /**
  * @brief Dumps blocks in logical order starting from the active list head.
  * 
- * This function traverses the logical chain of blocks using their successor
- * links and prints their details, including predecessor and successor links.
+ * This function follows the logical chain of blocks using their successor links and prints details of each block.
  */
 void dumpLogicalOrder();
 
@@ -71,7 +62,6 @@ void dumpLogicalOrder();
  * @param predecessorRBN RBN of the predecessor block in the chain.
  * @param successorRBN RBN of the successor block in the chain.
  */
-void createBlock(int RBN, bool isAvailable, const std::vector<std::string>& records,
-                 int predecessorRBN, int successorRBN);
+void createBlock(int RBN, bool isAvailable, const std::vector<std::string>& records, int predecessorRBN, int successorRBN);
 
-#endif // BLOCKED_SEQUENCE_SET_H
+#endif // BLOCK_H
