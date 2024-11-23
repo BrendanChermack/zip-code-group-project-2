@@ -40,7 +40,7 @@ int availHeadRBN = -1;
  * @param BLOCK_SIZE Maximum size of each block in bytes.
  * @return True if the file was successfully created, false otherwise.
  */
-bool createBlockFile(const std::string& inputFile, const std::string& outputFile, size_t BLOCK_SIZE) {
+bool createBlockFile(const std::string& inputFile, const std::string& outputFile, size_t BLOCK_SIZE = 512) {
     ifstream inFile(inputFile);
     ofstream outFile(outputFile);
     if (!inFile.is_open() || !outFile.is_open()) {
