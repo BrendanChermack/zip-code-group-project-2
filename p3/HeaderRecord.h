@@ -25,10 +25,10 @@ public:
     
     /**
      * @brief Writes the header information to a file
-     * @param filename Name of the file to write to
+     * @param file ofstream of the file to write to
      * @return true if successful, false otherwise
      */
-    bool writeHeader(const std::string& filename);
+    bool writeHeader(std::ofstream& file);
     
     /**
      * @brief Reads and parses header information from a file

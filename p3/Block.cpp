@@ -4,6 +4,7 @@
 #include <sstream>
 #include <vector>
 #include <map>
+#include "HeaderRecord.h"
 
 using namespace std;
 
@@ -44,6 +45,25 @@ bool createBlockFile(const std::string& inputFile, const std::string& outputFile
     ofstream outFile(outputFile);
     if (!inFile.is_open() || !outFile.is_open()) {
         cerr << "Error: Could not open input or output file: " << inputFile << " | " << outputFile << endl;
+        return false;
+    }
+
+    HeaderRecord header;
+    
+    // Set basic header information
+    header.setFileStructureType("blocked_sequence_set");
+    header.setVersion("1.0");
+    header.setBlockSize(512);  // Default block size
+    header.setMinBlockCapacity(0.5);  // 50% minimum capacity
+    header.setIndexFileName("headerTest.idx");
+    header.setIndexSchema("key:string,rbn:int");
+    
+    // Set primary key field (zip_code is field 0)
+    header.setPrimaryKeyField(0);
+
+    // First write the header
+    if (!header.writeHeader(outFile)) {
+        std::cerr << "Failed to write header to output file" << std::endl;
         return false;
     }
 

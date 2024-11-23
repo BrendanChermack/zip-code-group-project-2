@@ -11,12 +11,12 @@
  */
 HeaderRecord::HeaderRecord()
     : headerSize(0)
-    , recordSizeBytes(4)
+    , recordSizeBytes(-1)
     , blockSize(512)  // Default block size of 512 bytes
     , minBlockCapacity(0.5)  // Default 50% minimum capacity
-    , recordCount(0)
-    , blockCount(0)
-    , fieldCount(0)
+    , recordCount(40933) // Record count of input data
+    , blockCount(3679) 
+    , fieldCount(6) // Default 6 as all used zipcode data has 6 peramiters
     , primaryKeyField(0)
     , availListRBN(-1)
     , activeListRBN(-1)
@@ -40,15 +40,14 @@ void HeaderRecord::addField(const std::string& name, const std::string& schema) 
 }
 
 /**
- * @brief Writes the header information to a file
+ * @brief Writes the header information to an already open file stream
  * 
- * @param filename Name of the file to write to
+ * @param file Reference to an open output file stream
  * @return true if successful, false otherwise
  */
-bool HeaderRecord::writeHeader(const std::string& filename) {
-    std::ofstream file(filename);
+bool HeaderRecord::writeHeader(std::ofstream& file) {
     if (!file.is_open()) {
-        std::cerr << "Error: Unable to open file for writing: " << filename << std::endl;
+        std::cerr << "Error: File stream is not open" << std::endl;
         return false;
     }
 
@@ -84,7 +83,6 @@ bool HeaderRecord::writeHeader(const std::string& filename) {
         file << "\n";
     }
 
-    file.close();
     return true;
 }
 
