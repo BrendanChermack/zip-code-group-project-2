@@ -6,7 +6,13 @@
 
 using namespace std;
 
-// Helper function to split a string by a delimiter
+/**
+ * @brief Splits a string into tokens based on a specified delimiter.
+ *
+ * @param line The input string to be split.
+ * @param delimiter The character used as the delimiter for splitting the string.
+ * @return A vector containing the tokens extracted from the input string.
+ */
 vector<string> Index::split( const string& line, char delimiter ) {
   vector<string> tokens;
   string token;
@@ -17,7 +23,16 @@ vector<string> Index::split( const string& line, char delimiter ) {
   return tokens;
 }
 
-// Method to process block data
+/**
+ * @brief Processes block data from an input file and organizes it into an output file.
+ *
+ * This method reads data from an input file, extracts and processes relevant information,
+ * and writes the results into an output file. Each valid block and zip code pair is stored
+ * in the output file in the format "Block,Zip Code".
+ *
+ * @param inputFileName The name of the input file containing block data.
+ * @param outputFileName The name of the output file where processed data will be saved.
+ */
 void Index::processBlockData( const string& inputFileName, const string& outputFileName ) {
   ifstream inputFile( inputFileName );
   if ( !inputFile.is_open() ) {
