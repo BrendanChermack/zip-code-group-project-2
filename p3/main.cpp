@@ -1,4 +1,5 @@
 #include "Block.h"
+#include "Index.h"
 #include <iostream>
 #include <string>
 
@@ -35,6 +36,8 @@ int main() {
         return 1;
     }
 
+    Index index;
+    index.processBlockData( outputFile, "index.idx" );
     // Step 2: Parse the block file to populate the global blocks map
     parseBlockFile(outputFile);
 
@@ -74,8 +77,8 @@ int main() {
                     for (const string& record : block.records) {
                         cout << record << " ";
                     }
-                    cout << "\nPredecessor RBN: " << block.predecessorRBN << "\n";
-                    cout << "Successor RBN: " << block.successorRBN << "\n";
+                    cout << "\nPredecessor RBN: " << RBN-1 << "\n";
+                    cout << "Successor RBN: " << RBN+1 << "\n";
                 } else {
                     cout << "\nError: Block with RBN " << RBN << " not found.\n";
                 }
