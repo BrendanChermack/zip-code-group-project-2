@@ -40,7 +40,7 @@ int availHeadRBN = -1;
  * @param BLOCK_SIZE Maximum size of each block in bytes.
  * @return True if the file was successfully created, false otherwise.
  */
-bool createBlockFile(const std::string& inputFile, const std::string& outputFile, size_t BLOCK_SIZE = 512) {
+bool createBlockFile(const std::string& inputFile, const std::string& outputFile, size_t BLOCK_SIZE) {
     ifstream inFile(inputFile);
     ofstream outFile(outputFile);
     if (!inFile.is_open() || !outFile.is_open()) {
@@ -151,7 +151,7 @@ void parseBlockFile(const string& blockFile) {
  * and prints their details in ascending order of their RBNs.
  */
 void dumpPhysicalOrder() {
-    cout << "Dumping Blocks by Physical Order:\n";
+    cout << "Dumping Blocks by Physical Order:\n";                                        
     for (const auto& [RBN, block] : blocks) {
         cout << "RBN: " << RBN << " ";
         for (const string& record : block.records) {
@@ -174,12 +174,213 @@ void dumpLogicalOrder() {
         const Block& block = blocks[currentRBN];
         cout << "RBN: " << currentRBN << " ";
         for (const string& record : block.records) {
-            cout << record << " ";
+            cout << record << " " ;
         }
         cout << "\n";
         currentRBN = block.successorRBN;  ///< Move to the next block in the chain
     }
 }
+/**
+ * @brief Represents geographical location information for a zip code
+ *
+ * This struct stores detailed geographical data including state, 
+ * zip code, latitude, and longitude coordinates
+ */
+struct mostStorage {
+    std::string state, zip_code, county, other;
+    double latitude;
+    double longitude;
+};
+/**
+ * @brief Finds and lists the extreme points (easternmost, westernmost, 
+ *        northernmost, southernmost) for each state
+ *
+ * This function processes a collection of blocks containing location records,
+ * identifying the extreme geographical points for each state based on 
+ * longitude and latitude coordinates.
+ * 
+ * @details The function performs the following steps:
+ * - Iterates through all blocks and their records
+ * - Extracts state, ZIP code, latitude, and longitude information
+ * - Tracks the extreme points for each state
+ * - Stores the results in a map of state to extreme locations
+ * - Prints out the extreme point ZIP codes for each state
+ *
+ * @note Assumes records are in a specific order:
+ *       - Record 1: ZIP code
+ *       - Record 3: State
+ *       - Record 5: Latitude
+ *       - Record 6: Longitude
+ * 
+ * @pre Requires a global `blocks` container with records
+ * @post Prints extreme point information for each state
+ */
+void listMost() {
+	int currentRBN = listHeadRBN;
+	int recordPart = 0;
+	int testnum = 0;
+	mostStorage current, easternmost, westernmost, northernmost, southernmost;
+	std::map<string, std::vector<mostStorage>> sorted_directions;
+
+
+	for (const auto& [RBN, block] : blocks) {
+		  bool initialized = false;
+	
+			for (const string& record : block.records) {
+					recordPart++;
+					if(recordPart == 1){
+					current.zip_code = record;
+					}
+
+					if(recordPart == 3){
+					current.state = record;
+					}
+			 
+				if(recordPart == 5){
+					current.latitude = std::stod(record);
+				}
+				if(recordPart == 6){
+					current.longitude = std::stod(record);
+					if (!initialized) {
+                    easternmost = current;
+                    westernmost = current;
+                    northernmost = current;
+                    southernmost = current;
+                    initialized = true;
+                }
+				if ( current.longitude < easternmost.longitude ) {
+					easternmost = current;
+				}
+				if ( current.longitude > westernmost.longitude ) {
+					westernmost = current;
+				}
+				if ( current.latitude > northernmost.latitude ) {
+					northernmost = current;
+				}
+				if ( current.latitude < southernmost.latitude ) {
+					southernmost = current;
+				}
+				recordPart=0;
+				sorted_directions[ current.state ] = { easternmost, westernmost, northernmost, southernmost };
+				}
+			
+			
+			
+			
+			 }
+							}
+				 
+            
+						
+		 
+		 
+	cout <<"State: "<< "Easternmost: " << "westernmost: "<< "northernnmost: "<< "southernnmost: " <<endl;
+	for (const auto& [state, locations] : sorted_directions) {
+        if (locations.size() == 4) {  // Ensure we have all 4 directional records
+				cout << state << ","
+				<< locations[0].zip_code << ","  // Easternmost
+                 << locations[1].zip_code << ","  // Westernmost
+                 << locations[2].zip_code << ","  // Northernmost 
+                 << locations[3].zip_code << "\n";  // Southernmost
+		}
+	}
+}
+/**
+ * @brief Splits a string containing zip codes separated by "-z" delimiter
+ * @param str Input string containing zip codes
+ * @return vector<string> Vector containing individual zip codes
+ * @details Processes a string containing multiple zip codes separated by "-z" delimiter,
+ *          handles special cases like strings starting with "-z" and empty segments
+ */
+std::vector<std::string> splitZipLine(const std::string& str) {
+    std::vector<std::string> result;
+    size_t start = 0;
+    size_t end = str.find("-z", start);
+    
+    // Skip the first empty part if string starts with "-z"
+    if (start == end) {
+        start += 2;  // length of "-z"
+        end = str.find("-z", start);
+    }
+    
+    while (end != std::string::npos) {
+        // Add the part between current position and next "-z"
+        if (end - start > 0) {
+            result.push_back(str.substr(start, end - start));
+        }
+        start = end + 2;  // Skip over "-z"
+        end = str.find("-z", start);
+    }
+    
+    // Add the last part if there's anything left
+    if (start < str.length()) {
+        result.push_back(str.substr(start));
+    }
+    
+    return result;
+}
+
+
+void search(const std::string& str, const std::string& indexName){
+	
+	bool notfound = true;
+	std::string correct_line;
+	 std::ifstream file2(indexName); // Open the file add name later
+    if (!file2.is_open()) {
+        std::cerr << "Error opening file: index.txt " << std::endl;
+        return;
+    }
+	// cout << "str is: " << str << endl;
+	std::string strcopy = str;
+//	while (strcopy.length() > 0 && strcopy[0] == '0') {
+  //      strcopy.erase(0, 1);
+    //}
+	std::string length, zipcode; //Current word of the index being looked at
+    //The length to be skipped to find the proper line
+	int i = 5;
+	
+    while ((file2 >> zipcode >> length) && !file2.eof()) {  // reads word by word
+        if(zipcode == str){
+			int offset = std::stoi(length);
+			// cout << "Offset is: " << offset<< endl;
+            cout << "Zipcode:  " << zipcode << " is at "<< offset;
+			notfound = false;
+			break;
+			}
+			else{
+				i++;
+				
+			}
+			
+			}
+			
+	if(notfound){
+			cout<< str << " was not found in the file.";
+			}
+			file2.close();
+}
+}
+
+
+
+
+
+
+ void add(){
+	 
+	 
+ }
+ 
+ 
+ 
+ void remove(){
+	 
+	 
+ }
+
+
+
+
 
 /**
  * @brief Creates a new block and inserts it into the global map.
