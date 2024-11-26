@@ -321,7 +321,21 @@ std::vector<std::string> splitZipLine(const std::string& str) {
 }
 
 
-
+/**
+ * @brief Retrieves a block by its Relative Block Number (RBN)
+ * 
+ * This function searches the global blocks map for a block with the specified RBN.
+ * It returns a pointer to the block if found, or nullptr if the block does not exist.
+ * 
+ * @param requestedRBN The Relative Block Number of the block to retrieve
+ * @return Block* Pointer to the block if found, nullptr otherwise
+ * 
+ * @note Uses the global `blocks` map to perform the lookup
+ * @warning Returns nullptr if the block is not found
+ * 
+ * @see blocks
+ * @see Block
+ */
 Block* getBlockByRBN(int requestedRBN) {
     // Check if the block exists in the global blocks map
     auto it = blocks.find(requestedRBN);
@@ -336,6 +350,27 @@ Block* getBlockByRBN(int requestedRBN) {
     }
 }
 
+/**
+ * @brief Searches for a specific zip code in the block file and index file
+ * 
+ * This function performs the following steps:
+ * 1. Opens the index file and block file
+ * 2. Searches for the given zip code in the index file
+ * 3. If found, retrieves the corresponding block
+ * 4. Parses the block records to extract and display matching record details
+ * 
+ * @param str The zip code to search for
+ * @param indexName The name of the index file containing zip code to RBN mappings
+ * 
+ * @pre Requires a valid index file and block file to be present
+ * @post Prints the details of the matching record or a "not found" message
+ * 
+ * @note Uses mostStorage struct to store and display record information
+ * @note Assumes a specific record structure within each block
+ * 
+ * @see mostStorage
+ * @see Block
+ */
 
 void search(const std::string& str, const std::string& indexName){
 	mostStorage current;
