@@ -1,4 +1,4 @@
-line
+20blocked_sequence_set,031.0,010,014,05ASCII,03512,0250,14headerTest.idx,18key:string,rbn:int,010,010,015,010,02-1,02-1,008zip_code,09string(5),04city,10string(64),05state,09string(2),08latitude,12decimal(8,4),09longitude,12decimal(8,4),
 03501,10Holtsville,02NY,07Suffolk,0940.815400,10-73.045100
 03544,10Holtsville,02NY,07Suffolk,0940.815400,10-73.045100
 041001,06Agawam,02MA,07Hampden,0942.070200,10-72.622700
