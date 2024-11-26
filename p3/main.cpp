@@ -99,12 +99,9 @@ int main() {
 				cout << "Please enter the zip codes you want!" << endl;
 		std::string text;
 		cin >> text;
-		//put index maker here
 		auto result = splitZipLine(text);
 		for (const auto& str : result) {
-        //std::cout << str << std::endl;
-		//check(str,output1);
-		check(str, indexName );
+		check(str, index.idx );
 		break;
     }
 
