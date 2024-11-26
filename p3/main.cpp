@@ -26,7 +26,7 @@ using namespace std;
  */
 int main() {
     string inputFile = "us_postal_codes.csv";
-    string outputFile = "blocks.txt";
+    string outputFile = "block.txt";
 
     // Step 1: Create the block file from the input CSV
     if (createBlockFile(inputFile, outputFile)) {
@@ -47,7 +47,10 @@ int main() {
         cout << "1. Dump Blocks in Physical Order\n";
         cout << "2. Dump Blocks in Logical Order\n";
         cout << "3. Query a Block by RBN\n";
-        cout << "4. Exit\n";
+		cout << "4. Get the most of each state.\n";
+		cout << "5. Search for several zip codes.\n";
+        cout << "6. Exit\n";
+		
         cout << "Enter your choice: ";
 
         int choice;
@@ -84,10 +87,29 @@ int main() {
                 }
                 break;
             }
+			
+			case 4: {
+				listMost();
+                cout << "\n----- State Most Data -----\n";
+                break;
+            }
+			
+			
+			case 5: {
+				cout << "Please enter the zip codes you want!" << endl;
+		std::string text;
+		cin >> text;
+		auto result = splitZipLine(text);
+		for (const auto& str : result) {
+		search(str, "index.idx");
+    }
+		break;
+			}
 
-            case 4:
+            case 6:{
                 cout << "Exiting the program. Goodbye!\n";
                 return 0;
+			}
 
             default:
                 cout << "Invalid choice. Please try again.\n";

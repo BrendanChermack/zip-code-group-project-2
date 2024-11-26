@@ -151,7 +151,7 @@ void parseBlockFile(const string& blockFile) {
  * and prints their details in ascending order of their RBNs.
  */
 void dumpPhysicalOrder() {
-    cout << "Dumping Blocks by Physical Order:\n";
+    cout << "Dumping Blocks by Physical Order:\n";                                        
     for (const auto& [RBN, block] : blocks) {
         cout << "RBN: " << RBN << " ";
         for (const string& record : block.records) {
@@ -174,12 +174,285 @@ void dumpLogicalOrder() {
         const Block& block = blocks[currentRBN];
         cout << "RBN: " << currentRBN << " ";
         for (const string& record : block.records) {
-            cout << record << " ";
+            cout << record << " " ;
         }
         cout << "\n";
         currentRBN = block.successorRBN;  ///< Move to the next block in the chain
     }
 }
+/**
+ * @brief Represents geographical location information for a zip code
+ *
+ * This struct stores detailed geographical data including state, 
+ * zip code, latitude, and longitude coordinates
+ */
+struct mostStorage {
+    std::string state, zip_code, county, other;
+    double latitude;
+    double longitude;
+};
+/**
+ * @brief Finds and lists the extreme points (easternmost, westernmost, 
+ *        northernmost, southernmost) for each state
+ *
+ * This function processes a collection of blocks containing location records,
+ * identifying the extreme geographical points for each state based on 
+ * longitude and latitude coordinates.
+ * 
+ * @details The function performs the following steps:
+ * - Iterates through all blocks and their records
+ * - Extracts state, ZIP code, latitude, and longitude information
+ * - Tracks the extreme points for each state
+ * - Stores the results in a map of state to extreme locations
+ * - Prints out the extreme point ZIP codes for each state
+ *
+ * @note Assumes records are in a specific order:
+ *       - Record 1: ZIP code
+ *       - Record 3: State
+ *       - Record 5: Latitude
+ *       - Record 6: Longitude
+ * 
+ * @pre Requires a global `blocks` container with records
+ * @post Prints extreme point information for each state
+ */
+void listMost() {
+	int currentRBN = listHeadRBN;
+	int recordPart = 0;
+	int testnum = 0;
+	mostStorage current, easternmost, westernmost, northernmost, southernmost;
+	std::map<string, std::vector<mostStorage>> sorted_directions;
+
+
+	for (const auto& [RBN, block] : blocks) {
+		  bool initialized = false;
+	
+			for (const string& record : block.records) {
+					recordPart++;
+					if(recordPart == 1){
+					current.zip_code = record;
+					}
+
+					if(recordPart == 3){
+					current.state = record;
+					}
+			 
+				if(recordPart == 5){
+					current.latitude = std::stod(record);
+				}
+				if(recordPart == 6){
+					current.longitude = std::stod(record);
+					if (!initialized) {
+                    easternmost = current;
+                    westernmost = current;
+                    northernmost = current;
+                    southernmost = current;
+                    initialized = true;
+                }
+				if ( current.longitude < easternmost.longitude ) {
+					easternmost = current;
+				}
+				if ( current.longitude > westernmost.longitude ) {
+					westernmost = current;
+				}
+				if ( current.latitude > northernmost.latitude ) {
+					northernmost = current;
+				}
+				if ( current.latitude < southernmost.latitude ) {
+					southernmost = current;
+				}
+				recordPart=0;
+				sorted_directions[ current.state ] = { easternmost, westernmost, northernmost, southernmost };
+				}
+			
+			
+			
+			
+			 }
+							}
+				 
+            
+						
+		 
+		 
+	cout <<"State: "<< "Easternmost: " << "westernmost: "<< "northernnmost: "<< "southernnmost: " <<endl;
+	for (const auto& [state, locations] : sorted_directions) {
+        if (locations.size() == 4) {  // Ensure we have all 4 directional records
+				cout << state << ","
+				<< locations[0].zip_code << ","  // Easternmost
+                 << locations[1].zip_code << ","  // Westernmost
+                 << locations[2].zip_code << ","  // Northernmost 
+                 << locations[3].zip_code << "\n";  // Southernmost
+		}
+	}
+}
+/**
+ * @brief Splits a string containing zip codes separated by "-z" delimiter
+ * @param str Input string containing zip codes
+ * @return vector<string> Vector containing individual zip codes
+ * @details Processes a string containing multiple zip codes separated by "-z" delimiter,
+ *          handles special cases like strings starting with "-z" and empty segments
+ */
+std::vector<std::string> splitZipLine(const std::string& str) {
+    std::vector<std::string> result;
+    size_t start = 0;
+    size_t end = str.find("-z", start);
+    
+    // Skip the first empty part if string starts with "-z"
+    if (start == end) {
+        start += 2;  // length of "-z"
+        end = str.find("-z", start);
+    }
+    
+    while (end != std::string::npos) {
+        // Add the part between current position and next "-z"
+        if (end - start > 0) {
+            result.push_back(str.substr(start, end - start));
+        }
+        start = end + 2;  // Skip over "-z"
+        end = str.find("-z", start);
+    }
+    
+    // Add the last part if there's anything left
+    if (start < str.length()) {
+        result.push_back(str.substr(start));
+    }
+    
+    return result;
+}
+
+
+/**
+ * @brief Retrieves a block by its Relative Block Number (RBN)
+ * 
+ * This function searches the global blocks map for a block with the specified RBN.
+ * It returns a pointer to the block if found, or nullptr if the block does not exist.
+ * 
+ * @param requestedRBN The Relative Block Number of the block to retrieve
+ * @return Block* Pointer to the block if found, nullptr otherwise
+ * 
+ * @note Uses the global `blocks` map to perform the lookup
+ * @warning Returns nullptr if the block is not found
+ * 
+ * @see blocks
+ * @see Block
+ */
+Block* getBlockByRBN(int requestedRBN) {
+    // Check if the block exists in the global blocks map
+    auto it = blocks.find(requestedRBN);
+    
+    if (it != blocks.end()) {
+        // Block found, return a pointer to the block
+        return &(it->second);
+    } else {
+        // Block not found
+        std::cerr << "Block with RBN " << requestedRBN << " not found." << std::endl;
+        return nullptr;
+    }
+}
+
+/**
+ * @brief Searches for a specific zip code in the block file and index file
+ * 
+ * This function performs the following steps:
+ * 1. Opens the index file and block file
+ * 2. Searches for the given zip code in the index file
+ * 3. If found, retrieves the corresponding block
+ * 4. Parses the block records to extract and display matching record details
+ * 
+ * @param str The zip code to search for
+ * @param indexName The name of the index file containing zip code to RBN mappings
+ * 
+ * @pre Requires a valid index file and block file to be present
+ * @post Prints the details of the matching record or a "not found" message
+ * 
+ * @note Uses mostStorage struct to store and display record information
+ * @note Assumes a specific record structure within each block
+ * 
+ * @see mostStorage
+ * @see Block
+ */
+
+void search(const std::string& str, const std::string& indexName){
+	mostStorage current;
+	bool notfound = true;
+	std::string correct_line;
+	 std::ifstream file2(indexName); // Open the file add name later
+    if (!file2.is_open()) {
+        std::cerr << "Error opening file: index.txt " << std::endl;
+        return;
+    }
+	 std::ifstream file3("block.txt"); // Open the file add name later
+    if (!file3.is_open()) {
+        std::cerr << "Error opening file: block.txt " << std::endl;
+        return;
+    }
+	std::string strcopy = str;
+
+	std::string rbn, zipcode, line;
+	int recordPart = 0;
+	//int i = 5;
+	getline( file2, line );
+	line = "";
+    while ((file2 >> zipcode >> rbn) && !file2.eof()) {  // reads word by word
+        if(zipcode == str){
+			int block = std::stoi(rbn);
+            cout << "Zipcode:  " << zipcode << " is at "<< block <<endl;
+			Block* myBlock = getBlockByRBN(block);
+			for (const string& record : myBlock->records) {
+					recordPart++;
+					if(recordPart == 1){
+					current.zip_code = record;
+					
+					}
+					if(recordPart == 2){
+					current.other = record;
+					
+					}
+					if(recordPart == 3){
+					current.state = record;
+					}
+					if(recordPart == 4){
+					current.county = record;
+					
+					}
+				if(recordPart == 5){
+					current.latitude = std::stod(record);
+				}
+				if(recordPart == 6){
+					current.longitude = std::stod(record);
+					
+					if(current.zip_code == zipcode){
+						cout << current.zip_code << " " <<current.other << " "<<current.state << " "<<current.county 
+					<< " "<<current.latitude << " " <<current.longitude << " "<< endl;
+					notfound = false;
+					break;
+					}
+				//	current.longitude = std::stod(record);
+				/*	if (!initialized) {
+                    easternmost = current;
+                    westernmost = current;
+                    northernmost = current;
+                    southernmost = current;
+                    initialized = true;*/
+                
+
+				recordPart=0;
+			}
+				}
+			}
+			
+			
+		//	break;
+			}
+			
+			
+			
+	if(notfound){
+			cout<< str << " was not found in the file."<<endl;
+			}
+			file2.close();
+}
+
 
 /**
  * @brief Creates a new block and inserts it into the global map.
