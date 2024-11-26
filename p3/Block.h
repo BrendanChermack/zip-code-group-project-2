@@ -102,4 +102,10 @@ void parseBlockFile(const std::string& blockFile);
  */
 bool createBlockFile(const std::string& inputFile, const std::string& outputFile, size_t BLOCK_SIZE = 512);
 
+
+
+void listMost();
+
+void search(const std::string& str, const std::string& indexName);
+
 #endif // BLOCK_H
