@@ -321,8 +321,24 @@ std::vector<std::string> splitZipLine(const std::string& str) {
 }
 
 
+
+Block* getBlockByRBN(int requestedRBN) {
+    // Check if the block exists in the global blocks map
+    auto it = blocks.find(requestedRBN);
+    
+    if (it != blocks.end()) {
+        // Block found, return a pointer to the block
+        return &(it->second);
+    } else {
+        // Block not found
+        std::cerr << "Block with RBN " << requestedRBN << " not found." << std::endl;
+        return nullptr;
+    }
+}
+
+
 void search(const std::string& str, const std::string& indexName){
-	
+	mostStorage current;
 	bool notfound = true;
 	std::string correct_line;
 	 std::ifstream file2(indexName); // Open the file add name later
@@ -330,56 +346,77 @@ void search(const std::string& str, const std::string& indexName){
         std::cerr << "Error opening file: index.txt " << std::endl;
         return;
     }
-	// cout << "str is: " << str << endl;
+	 std::ifstream file3("block.txt"); // Open the file add name later
+    if (!file3.is_open()) {
+        std::cerr << "Error opening file: block.txt " << std::endl;
+        return;
+    }
 	std::string strcopy = str;
-//	while (strcopy.length() > 0 && strcopy[0] == '0') {
-  //      strcopy.erase(0, 1);
-    //}
-	std::string length, zipcode; //Current word of the index being looked at
-    //The length to be skipped to find the proper line
-	int i = 5;
-	
-    while ((file2 >> zipcode >> length) && !file2.eof()) {  // reads word by word
+
+	std::string rbn, zipcode, line;
+	int recordPart = 0;
+	//int i = 5;
+	getline( file2, line );
+	line = "";
+    while ((file2 >> zipcode >> rbn) && !file2.eof()) {  // reads word by word
         if(zipcode == str){
-			int offset = std::stoi(length);
-			// cout << "Offset is: " << offset<< endl;
-            cout << "Zipcode:  " << zipcode << " is at "<< offset;
-			notfound = false;
-			break;
+			int block = std::stoi(rbn);
+            cout << "Zipcode:  " << zipcode << " is at "<< block <<endl;
+			Block* myBlock = getBlockByRBN(block);
+			for (const string& record : myBlock->records) {
+					recordPart++;
+					if(recordPart == 1){
+					current.zip_code = record;
+					
+					}
+					if(recordPart == 2){
+					current.other = record;
+					
+					}
+					if(recordPart == 3){
+					current.state = record;
+					}
+					if(recordPart == 4){
+					current.county = record;
+					
+					}
+				if(recordPart == 5){
+					current.latitude = std::stod(record);
+				}
+				if(recordPart == 6){
+					current.longitude = std::stod(record);
+					
+					if(current.zip_code == zipcode){
+						cout << current.zip_code << " " <<current.other << " "<<current.state << " "<<current.county 
+					<< " "<<current.latitude << " " <<current.longitude << " "<< endl;
+					notfound = false;
+					break;
+					}
+				//	current.longitude = std::stod(record);
+				/*	if (!initialized) {
+                    easternmost = current;
+                    westernmost = current;
+                    northernmost = current;
+                    southernmost = current;
+                    initialized = true;*/
+                
+
+				recordPart=0;
 			}
-			else{
-				i++;
-				
+				}
 			}
 			
+			
+		//	break;
 			}
+			
+			
 			
 	if(notfound){
-			cout<< str << " was not found in the file.";
+			cout<< str << " was not found in the file."<<endl;
 			}
 			file2.close();
 }
-}
-
-
-
-
-
-
- void add(){
-	 
-	 
- }
- 
- 
- 
- void remove(){
-	 
-	 
- }
-
-
-
 
 
 /**
