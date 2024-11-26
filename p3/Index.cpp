@@ -75,7 +75,7 @@ void Index::processBlockData( const string& inputFileName, const string& outputF
       for ( size_t i = 0; i < fields.size(); i += 6 ) {
         if ( !fields[ i ].empty() && isdigit( fields[ i ][ 0 ] ) ) {
           string zipCode = fields[ i ];
-          outputFile << zipCode << "," << block << "\n";
+          outputFile << zipCode << " " << block << "\n";
         }
       }
     }

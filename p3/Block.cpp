@@ -394,49 +394,49 @@ void search(const std::string& str, const std::string& indexName){
 	getline( file2, line );
 	line = "";
     while ((file2 >> zipcode >> rbn) && !file2.eof()) {  // reads word by word
-        if(zipcode == str){
-			int block = std::stoi(rbn);
-            cout << "Zipcode:  " << zipcode << " is at "<< block <<endl;
-			Block* myBlock = getBlockByRBN(block);
-			for (const string& record : myBlock->records) {
-					recordPart++;
-					if(recordPart == 1){
-					current.zip_code = record;
-					
-					}
-					if(recordPart == 2){
-					current.other = record;
-					
-					}
-					if(recordPart == 3){
-					current.state = record;
-					}
-					if(recordPart == 4){
-					current.county = record;
-					
-					}
-				if(recordPart == 5){
-					current.latitude = std::stod(record);
-				}
-				if(recordPart == 6){
-					current.longitude = std::stod(record);
-					
-					if(current.zip_code == zipcode){
-						cout << current.zip_code << " " <<current.other << " "<<current.state << " "<<current.county 
-					<< " "<<current.latitude << " " <<current.longitude << " "<< endl;
-					notfound = false;
-					break;
-					}
-				//	current.longitude = std::stod(record);
-				/*	if (!initialized) {
-                    easternmost = current;
-                    westernmost = current;
-                    northernmost = current;
-                    southernmost = current;
-                    initialized = true;*/
-                
+      if(zipcode == str){
+        int block = std::stoi(rbn);
+              cout << "Zipcode:  " << zipcode << " is at "<< block <<endl;
+        Block* myBlock = getBlockByRBN(block);
+        for (const string& record : myBlock->records) {
+            recordPart++;
+            if(recordPart == 1){
+            current.zip_code = record;
+            
+            }
+            if(recordPart == 2){
+            current.other = record;
+            
+            }
+            if(recordPart == 3){
+            current.state = record;
+            }
+            if(recordPart == 4){
+            current.county = record;
+            
+            }
+          if(recordPart == 5){
+            current.latitude = std::stod(record);
+          }
+          if(recordPart == 6){
+            current.longitude = std::stod(record);
+            
+            if(current.zip_code == zipcode){
+              cout << current.zip_code << " " <<current.other << " "<<current.state << " "<<current.county 
+            << " "<<current.latitude << " " <<current.longitude << " "<< endl;
+            notfound = false;
+            break;
+            }
+          //	current.longitude = std::stod(record);
+          /*	if (!initialized) {
+                      easternmost = current;
+                      westernmost = current;
+                      northernmost = current;
+                      southernmost = current;
+                      initialized = true;*/
+                  
 
-				recordPart=0;
+				  recordPart=0;
 			}
 				}
 			}
