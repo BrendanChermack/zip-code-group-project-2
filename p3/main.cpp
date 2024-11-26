@@ -26,7 +26,7 @@ using namespace std;
  */
 int main() {
     string inputFile = "us_postal_codes.csv";
-    string outputFile = "blocks.txt";
+    string outputFile = "block.txt";
 
     // Step 1: Create the block file from the input CSV
     if (createBlockFile(inputFile, outputFile)) {
@@ -101,9 +101,10 @@ int main() {
 		cin >> text;
 		auto result = splitZipLine(text);
 		for (const auto& str : result) {
-		check(str, index.idx );
-		break;
+		search(str, "index.idx");
     }
+		break;
+			}
 
             case 6:{
                 cout << "Exiting the program. Goodbye!\n";
