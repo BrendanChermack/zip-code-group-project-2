@@ -44,7 +44,10 @@ int main() {
         cout << "1. Dump Blocks in Physical Order\n";
         cout << "2. Dump Blocks in Logical Order\n";
         cout << "3. Query a Block by RBN\n";
-        cout << "4. Exit\n";
+		cout << "4. Get the most of each state.\n";
+		cout << "5. Search for several zip codes.\n";
+        cout << "6. Exit\n";
+		
         cout << "Enter your choice: ";
 
         int choice;
@@ -81,10 +84,31 @@ int main() {
                 }
                 break;
             }
+			
+			case 4: {
+				listMost();
+                cout << "\n----- State Most Data -----\n";
+                break;
+            }
+			
+			
+			case 5: {
+				cout << "Please enter the zip codes you want!" << endl;
+		std::string text;
+		cin >> text;
+		//put index maker here
+		auto result = splitZipLine(text);
+		for (const auto& str : result) {
+        //std::cout << str << std::endl;
+		//check(str,output1);
+		check(str, indexName );
+		break;
+    }
 
-            case 4:
+            case 6:{
                 cout << "Exiting the program. Goodbye!\n";
                 return 0;
+			}
 
             default:
                 cout << "Invalid choice. Please try again.\n";
