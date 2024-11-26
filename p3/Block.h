@@ -108,4 +108,6 @@ void listMost();
 
 void search(const std::string& str, const std::string& indexName);
 
+std::vector<std::string> splitZipLine(const std::string& str);
+
 #endif // BLOCK_H
